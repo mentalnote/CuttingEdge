@@ -7,28 +7,27 @@
 #include <SDL_opengl.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 using namespace std;
 
 // Shader sources
 const GLchar* vertexSource =
 "#version 150 core\n"
-"in vec2 position;"
-"in vec3 color;"
-"out vec3 Color;"
+"in vec3 position;"
 "void main() {"
-"   Color = color;"
-"   gl_Position = vec4(position, 0.0, 1.0);"
+"   gl_Position = vec4(position, 1.0);"
 "}";
 const GLchar* fragmentSource =
 "#version 150 core\n"
-"in vec3 Color;"
 "out vec4 outColor;"
 "void main() {"
-"   outColor = vec4(Color, 1.0);"
+"   outColor = vec4(1.0, 1.0, 0.0, 1.0);"
 "}";
 
 static Assimp::Importer* importer;
+
+ofstream logfile;
 
 const struct aiScene* modelData;
 
@@ -38,6 +37,7 @@ GLuint BufferMesh(aiMesh* mesh);
 
 int main(int argc, char *argv[])
 {
+	logfile.open("../log.txt");
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -46,15 +46,17 @@ int main(int argc, char *argv[])
 	SDL_GLContext context = SDL_GL_CreateContext(window);
 
 	glewExperimental = GL_TRUE;
+
 	glewInit();
 
 	importer = new Assimp::Importer();
 
-	modelData = importer->ReadFile("../Resources/Models/barrel.obj", 0);
+	modelData = importer->ReadFile("../Resources/Models/barrel.obj", aiProcess_Triangulate);
 
 	if (modelData == nullptr) {
 		return Cleanup(context);
 	}
+
 
 	GLuint numTris = BufferMesh(modelData->mMeshes[0]);
 
@@ -79,11 +81,9 @@ int main(int argc, char *argv[])
 	// Specify the layout of the vertex data
 	GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
 	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);	
 
-	GLint colAttrib = glGetAttribLocation(shaderProgram, "color");
-	glEnableVertexAttribArray(colAttrib);
-	glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+	logfile << "ERROR: " << glGetError() << "\n";
 
 	SDL_Event windowEvent;
 	while (true)
@@ -95,11 +95,10 @@ int main(int argc, char *argv[])
 				windowEvent.key.keysym.sym == SDLK_ESCAPE) break;
 		}
 
-		// Clear the screen to black
 		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawElements(GL_TRIANGLES, 120, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, numTris, GL_UNSIGNED_INT, 0);
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -108,6 +107,7 @@ int main(int argc, char *argv[])
 }
 
 int Cleanup(SDL_GLContext context) {
+	logfile.close();
 	SDL_GL_DeleteContext(context);
 	SDL_Quit();
 	return 0;
@@ -124,8 +124,7 @@ GLuint BufferMesh(aiMesh* mesh) {
 	GLfloat* vertices = new GLfloat[numVerts * 3];
 	//Delete array sometime (use delete[])
 
-	ofstream log;
-	log.open("../log.txt");
+	logfile << numVerts << ", " << numFaces << "\n";
 
 	for (int i = 0; i < numVerts; i++) {
 
@@ -135,7 +134,7 @@ GLuint BufferMesh(aiMesh* mesh) {
 		vertices[index + 1] = mesh->mVertices[i].y;
 		vertices[index + 2] = mesh->mVertices[i].z;
 		
-		log << vertices[index] << ", " << vertices[index + 1] << ", " << vertices[index + 1] << "\n";
+		logfile << vertices[index] << ", " << vertices[index + 1] << ", " << vertices[index + 2] << "\n";
 	}
 
 	for (int i = 0; i < numFaces; i++) {
@@ -145,15 +144,15 @@ GLuint BufferMesh(aiMesh* mesh) {
 		faces[index] = mesh->mFaces[i].mIndices[0];
 		faces[index + 1] = mesh->mFaces[i].mIndices[1];
 		faces[index + 2] = mesh->mFaces[i].mIndices[2];
+
+		logfile << faces[index] << ", " << faces[index + 1] << ", " << faces[index + 2] << "\n";
 	}
 
-	log.close();
-
 	//GLfloat vertices[] = {
-	//	-0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // Top-left
-	//	0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // Top-right
-	//	0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Bottom-right
-	//	-0.5f, -0.5f, 1.0f, 1.0f, 1.0f  // Bottom-left
+	//	-0.5f,  0.5f, 0.0f, // Top-left
+	//	0.5f,  0.5f, 0.0f, // Top-right
+	//	0.5f, -0.5f, 0.0f, // Bottom-right
+	//	-0.5f, -0.5f, 0.0f  // Bottom-left
 	//};
 
 	//GLuint faces[] = {
@@ -171,15 +170,15 @@ GLuint BufferMesh(aiMesh* mesh) {
 	glGenBuffers(1, &vbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 3, vertices, GL_STATIC_DRAW);
 
 	// Create an element array
 	GLuint ebo;
 	glGenBuffers(1, &ebo);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(faces), faces, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * numFaces * 3, faces, GL_STATIC_DRAW);
 
-	return numFaces;
+	return numFaces * 3;
 }
 
