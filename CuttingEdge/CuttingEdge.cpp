@@ -148,18 +148,6 @@ GLuint BufferMesh(aiMesh* mesh) {
 		logfile << faces[index] << ", " << faces[index + 1] << ", " << faces[index + 2] << "\n";
 	}
 
-	//GLfloat vertices[] = {
-	//	-0.5f,  0.5f, 0.0f, // Top-left
-	//	0.5f,  0.5f, 0.0f, // Top-right
-	//	0.5f, -0.5f, 0.0f, // Bottom-right
-	//	-0.5f, -0.5f, 0.0f  // Bottom-left
-	//};
-
-	//GLuint faces[] = {
-	//	0, 1, 2,
-	//	2, 3, 0
-	//};
-
 	// Create Vertex Array Object
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
