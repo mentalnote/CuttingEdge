@@ -38,5 +38,8 @@
     <ClInclude Include="Drawable.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="gl_includes.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

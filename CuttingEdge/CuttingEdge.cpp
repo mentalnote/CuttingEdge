@@ -1,13 +1,9 @@
 #include <stdio.h>
 #include <fstream>
 
-#define GLEW_STATIC
-#include <GL/glew.h>
-#include <SDL.h>
-#include <SDL_opengl.h>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include "gl_includes.h"
+#include "ResourceManager.h"
+#include "Drawable.h"
 
 using namespace std;
 
@@ -16,8 +12,9 @@ const GLchar* vertexSource =
 "#version 150 core\n"
 "in vec3 position;"
 "void main() {"
-"   gl_Position = vec4(position, 1.0);"
+"   gl_Position = vec4(position.xy * 0.2, 0.0, 1.0);"
 "}";
+
 const GLchar* fragmentSource =
 "#version 150 core\n"
 "out vec4 outColor;"
@@ -25,15 +22,11 @@ const GLchar* fragmentSource =
 "   outColor = vec4(1.0, 1.0, 0.0, 1.0);"
 "}";
 
-static Assimp::Importer* importer;
-
 ofstream logfile;
 
-const struct aiScene* modelData;
+Drawable** drawArray;
 
 int Cleanup(SDL_GLContext context);
-
-GLuint BufferMesh(aiMesh* mesh);
 
 int main(int argc, char *argv[])
 {
@@ -41,7 +34,7 @@ int main(int argc, char *argv[])
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_Window* window = SDL_CreateWindow("OpenGL", 100, 100, 800, 600, SDL_WINDOW_OPENGL);
 	SDL_GLContext context = SDL_GL_CreateContext(window);
 
@@ -49,16 +42,18 @@ int main(int argc, char *argv[])
 
 	glewInit();
 
-	importer = new Assimp::Importer();
+	drawArray = new Drawable*[2];
 
-	modelData = importer->ReadFile("../Resources/Models/barrel.obj", aiProcess_Triangulate);
-
-	if (modelData == nullptr) {
-		return Cleanup(context);
+	try {
+		drawArray[0] = &ResourceManager::LoadMesh(std::string("../Resources/Models/barrel.obj"));
+		drawArray[1] = &ResourceManager::LoadMesh(std::string("../Resources/Models/pot.obj"));
+	}
+	catch (int e) {
+		logfile << "ERROR: " << e << " Failed to open file/s" << "\n";
 	}
 
-
-	GLuint numTris = BufferMesh(modelData->mMeshes[0]);
+	ResourceManager::BufferMesh(((Mesh*) drawArray[0])->GetMeshData());
+	ResourceManager::BufferMesh(((Mesh*) drawArray[1])->GetMeshData());
 
 	// Create and compile the vertex shader
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -78,11 +73,6 @@ int main(int argc, char *argv[])
 	glLinkProgram(shaderProgram);
 	glUseProgram(shaderProgram);
 
-	// Specify the layout of the vertex data
-	GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);	
-
 	logfile << "ERROR: " << glGetError() << "\n";
 
 	SDL_Event windowEvent;
@@ -98,7 +88,9 @@ int main(int argc, char *argv[])
 		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawElements(GL_TRIANGLES, numTris, GL_UNSIGNED_INT, 0);
+		for (int i = 0; i < 2; i++) {
+			drawArray[i]->Draw();
+		}
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -111,62 +103,5 @@ int Cleanup(SDL_GLContext context) {
 	SDL_GL_DeleteContext(context);
 	SDL_Quit();
 	return 0;
-}
-
-GLuint BufferMesh(aiMesh* mesh) {
-
-	int numVerts = mesh->mNumVertices;
-
-	int numFaces = mesh->mNumFaces;
-
-	GLuint* faces = new GLuint[numFaces * 3];
-
-	GLfloat* vertices = new GLfloat[numVerts * 3];
-	//Delete array sometime (use delete[])
-
-	logfile << numVerts << ", " << numFaces << "\n";
-
-	for (int i = 0; i < numVerts; i++) {
-
-		int index = i * 3;
-
-		vertices[index] = mesh->mVertices[i].x;
-		vertices[index + 1] = mesh->mVertices[i].y;
-		vertices[index + 2] = mesh->mVertices[i].z;
-		
-		logfile << vertices[index] << ", " << vertices[index + 1] << ", " << vertices[index + 2] << "\n";
-	}
-
-	for (int i = 0; i < numFaces; i++) {
-
-		int index = i * 3;
-
-		faces[index] = mesh->mFaces[i].mIndices[0];
-		faces[index + 1] = mesh->mFaces[i].mIndices[1];
-		faces[index + 2] = mesh->mFaces[i].mIndices[2];
-
-		logfile << faces[index] << ", " << faces[index + 1] << ", " << faces[index + 2] << "\n";
-	}
-
-	// Create Vertex Array Object
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	// Create a Vertex Buffer Object and copy the vertex data to it
-	GLuint vbo;
-	glGenBuffers(1, &vbo);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * numVerts * 3, vertices, GL_STATIC_DRAW);
-
-	// Create an element array
-	GLuint ebo;
-	glGenBuffers(1, &ebo);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * numFaces * 3, faces, GL_STATIC_DRAW);
-
-	return numFaces * 3;
 }
 

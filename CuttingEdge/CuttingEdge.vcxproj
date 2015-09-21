@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Drawable.h" />
+    <ClInclude Include="gl_includes.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ResourceManager.h" />
   </ItemGroup>
