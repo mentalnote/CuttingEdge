@@ -1,4 +1,61 @@
 #include "Transform.h"
+#include "Component.h"
+
+void * Transform::operator new(size_t size)
+{
+	return _aligned_malloc(size, Transform::ALLOC);
+}
+
+void Transform::operator delete(void * p)
+{
+	return _aligned_free(p);
+}
+
+Transform::~Transform()
+{
+	for (Transform* child : this->children) {
+		delete child;
+	}
+
+	for (Component* component : this->components) {
+		delete component;
+	}
+}
+
+Transform::Transform(Transform* parent, std::string name)
+{
+	this->parent = parent;
+	if (parent) {
+		this->parent->addChildRef(this);
+	}
+
+	this->name = name;
+	this->localPosition = glm::vec3();
+	this->localRotation = glm::quat();
+	this->localScale = glm::vec3(1.0f, 1.0f, 1.0f);
+	this->dirtyFlags = dirty_All;
+}
+
+Transform::Transform(glm::vec3 position, glm::quat rotation, glm::vec3 scale, Transform* parent, std::string name)
+{
+	this->parent = parent;
+	if (parent) {
+		this->parent->addChildRef(this);
+	}
+
+	this->name = name;
+	this->localPosition = position;
+	this->localRotation = rotation;
+	this->localScale = scale;
+	this->dirtyFlags = dirty_All;
+}
+
+void Transform::RemoveComponent(Component * component)
+{
+	this->components.erase(std::find(this->components.begin(), this->components.end(), component));
+
+	delete component;
+}
 
 Transform * Transform::GetParent() const
 {
@@ -28,6 +85,8 @@ void Transform::SetParent(Transform * parent, bool preserveWorld)
 	}
 
 	this->parent = parent;
+
+	this->parent->addChildRef(this);
 }
 
 std::vector<Transform*> Transform::GetChildren() const
@@ -163,6 +222,13 @@ void Transform::SetWorldScale(glm::vec3 scale)
 	this->dirtyFlags &= ~dirty_Scale;
 }
 
+glm::vec3 Transform::GetForward()
+{
+	glm::vec3 forward = GlobalForward * GetWorldRotation();
+	
+	return forward;
+}
+
 glm::mat4x4 Transform::GetWorldMatrix()
 {
 	if (!this->dirtyFlags & dirty_Matrix) {
@@ -173,7 +239,7 @@ glm::mat4x4 Transform::GetWorldMatrix()
 	glm::mat4 rotate = glm::mat4_cast(this->GetWorldRotation());
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), this->GetWorldScale());
 	
-	this->worldMatrix = translate * scale * rotate;
+	this->worldMatrix = translate * rotate * scale;
 
 	this->dirtyFlags &= ~dirty_Matrix;
 
@@ -183,4 +249,9 @@ glm::mat4x4 Transform::GetWorldMatrix()
 void Transform::removeChildRef(Transform * child)
 {
 	this->children.erase(std::find(this->children.begin(), this->children.end(), child));
+}
+
+void Transform::addChildRef(Transform * child)
+{
+	this->children.push_back(child);
 }

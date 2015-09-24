@@ -1,32 +1,46 @@
 #include <stdio.h>
 #include <fstream>
+#include "Time.h"
+#include "Input.h"
 
 #include "gl_includes.h"
 #include "ResourceManager.h"
-#include "Drawable.h"
+#include "Scene.h"
+#include "FPSCamera.h"
+#include "MeshComponent.h"
+
 
 using namespace std;
 
 // Shader sources
 const GLchar* vertexSource =
 "#version 150 core\n"
+"uniform mat4 MVP;"
 "in vec3 position;"
+"out vec4 colour;"
 "void main() {"
-"   gl_Position = vec4(position.xy * 0.2, 0.0, 1.0);"
+"   gl_Position = MVP * vec4(position.xyz * 0.01, 1.0);"
+"   colour = vec4(position.xyz, 1.0);"
 "}";
 
 const GLchar* fragmentSource =
 "#version 150 core\n"
+"in vec4 colour;"
 "out vec4 outColor;"
 "void main() {"
-"   outColor = vec4(1.0, 1.0, 0.0, 1.0);"
+"   outColor = colour;"
 "}";
+
+const string barrelPath = "../Resources/Models/bear.obj";
+const string potPath = "../Resources/Models/deer.obj";
 
 ofstream logfile;
 
-Drawable** drawArray;
+Scene* scene;
 
 int Cleanup(SDL_GLContext context);
+
+Scene* CreateDefaultScene();
 
 int main(int argc, char *argv[])
 {
@@ -42,18 +56,13 @@ int main(int argc, char *argv[])
 
 	glewInit();
 
-	drawArray = new Drawable*[2];
+	scene = CreateDefaultScene();
 
-	try {
-		drawArray[0] = &ResourceManager::LoadMesh(std::string("../Resources/Models/barrel.obj"));
-		drawArray[1] = &ResourceManager::LoadMesh(std::string("../Resources/Models/pot.obj"));
+	if(scene == nullptr)
+	{
+		Cleanup(context);
+		return 0;
 	}
-	catch (int e) {
-		logfile << "ERROR: " << e << " Failed to open file/s" << "\n";
-	}
-
-	ResourceManager::BufferMesh(((Mesh*) drawArray[0])->GetMeshData());
-	ResourceManager::BufferMesh(((Mesh*) drawArray[1])->GetMeshData());
 
 	// Create and compile the vertex shader
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -67,35 +76,108 @@ int main(int argc, char *argv[])
 
 	// Link the vertex and fragment shader into a shader program
 	GLuint shaderProgram = glCreateProgram();
+
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glBindFragDataLocation(shaderProgram, 0, "outColor");
+
+	matrixID = glGetUniformLocation(shaderProgram, "MVP"); ;
+
 	glLinkProgram(shaderProgram);
 	glUseProgram(shaderProgram);
 
 	logfile << "ERROR: " << glGetError() << "\n";
+
+	Time time = Time();
+	Input input = Input(SDL_GetKeyboardState(nullptr));
 
 	SDL_Event windowEvent;
 	while (true)
 	{
 		if (SDL_PollEvent(&windowEvent))
 		{
+			input.SetInputEvent(&windowEvent);
+
 			if (windowEvent.type == SDL_QUIT) break;
 			if (windowEvent.type == SDL_KEYUP &&
 				windowEvent.key.keysym.sym == SDLK_ESCAPE) break;
+		} else
+		{
+			input.SetInputEvent(nullptr);
 		}
+
+		time.Tick();
+
+		scene->Process();
+
+		//glm::mat4 mat = scene->GetActiveCamera()->transform->GetWorldMatrix();
+		//logfile << "---------------------------------\n";
+		//logfile << "|" << to_string(mat[0][0]) << "  " << to_string(mat[0][1]) << "  " << to_string(mat[0][2]) << "  " << to_string(mat[0][3]) << "|\n";
+		//logfile << "|" << to_string(mat[1][0]) << "  " << to_string(mat[1][1]) << "  " << to_string(mat[1][2]) << "  " << to_string(mat[1][3]) << "|\n";
+		//logfile << "|" << to_string(mat[2][0]) << "  " << to_string(mat[2][1]) << "  " << to_string(mat[2][2]) << "  " << to_string(mat[2][3]) << "|\n";
+		//logfile << "|" << to_string(mat[3][0]) << "  " << to_string(mat[3][1]) << "  " << to_string(mat[3][2]) << "  " << to_string(mat[3][3]) << "|\n";
 
 		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		for (int i = 0; i < 2; i++) {
-			drawArray[i]->Draw();
-		}
+		scene->Draw();
 
 		SDL_GL_SwapWindow(window);
 	}
 
 	return Cleanup(context);
+}
+
+Scene* CreateDefaultScene() {
+	Scene* defaultScene = new Scene();
+
+	Transform* cTransform = defaultScene->CreateTransform(nullptr, "Cam Node");
+	cTransform->SetLocalRotation(glm::quat(0.0f, glm::vec3(0.0f, 1.0f, 0.0f)));
+	cTransform->SetLocalPosition(glm::vec3(0.0f, 0.0f, -10.0f));
+	Camera* camera = new Camera(Camera::ProjectionMode::Perspective, cTransform);
+	
+	defaultScene->AddComponent(new FPSCamera(cTransform, camera, "Camera"));
+	defaultScene->SetActiveCamera(camera);
+
+	Transform* stuffGroup = defaultScene->CreateTransform(nullptr, "Animals");
+
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			for (int k = 0; k < 8; k++){
+				if (k % 2) {
+					string name = "";
+					name = name.append("barrel(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
+					Transform* barrel = defaultScene->CreateTransform(stuffGroup, name);
+					barrel->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
+
+					if(Mesh* mComponent = ResourceManager::LoadMesh(barrelPath))
+					{
+						defaultScene->AddComponent(new MeshComponent(barrel, mComponent, name));
+					} else
+					{
+						return nullptr;
+					}
+				}
+				else {
+					string name = "";
+					name = name.append("pot(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
+					Transform* pot = defaultScene->CreateTransform(stuffGroup, name);
+					pot->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
+
+					if (Mesh* mComponent = ResourceManager::LoadMesh(potPath))
+					{
+						defaultScene->AddComponent(new MeshComponent(pot, mComponent, name));
+					}
+					else
+					{
+						return nullptr;
+					}
+				}
+			}
+		}
+	}
+
+	return defaultScene;
 }
 
 int Cleanup(SDL_GLContext context) {

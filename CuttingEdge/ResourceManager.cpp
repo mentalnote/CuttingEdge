@@ -4,7 +4,7 @@ Assimp::Importer* ResourceManager::importer = new Assimp::Importer();
 
 std::unordered_map<std::string, Mesh::MeshData*> ResourceManager::meshMap = std::unordered_map<std::string, Mesh::MeshData*>();
 
-Mesh ResourceManager::LoadMesh (std::string path) {
+Mesh* ResourceManager::LoadMesh (std::string path) {
 
 	Mesh::MeshData* meshData = meshMap[path];
 
@@ -14,9 +14,9 @@ Mesh ResourceManager::LoadMesh (std::string path) {
 		const struct aiScene* modelData;
 
 		modelData = importer->ReadFile(path, aiProcess_Triangulate);
-
+		
 		if (modelData == nullptr) {
-			throw 1;
+			return nullptr;
 		}
 
 		aiMesh* mesh = modelData->mMeshes[0];
@@ -30,7 +30,7 @@ Mesh ResourceManager::LoadMesh (std::string path) {
 		meshData->vertices = CreateFlatVertexArray(mesh->mVertices, mesh->mNumVertices);
 	}
 
-	return Mesh(meshData);
+	return new Mesh(meshData);
 }
 
 bool ResourceManager::BufferMesh(Mesh::MeshData* meshData) {

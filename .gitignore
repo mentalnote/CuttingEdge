@@ -45,6 +45,7 @@ dlldata.c
 *.ilk
 *.meta
 *.obj
+![Rr]esources/[Mm]odels/*.obj
 *.pch
 *.pdb
 *.pgc

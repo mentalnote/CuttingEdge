@@ -1,8 +1,11 @@
 #pragma once
 #include "gl_includes.h"
-#include "Drawable.h"
 #include <vector>
 #include <string>
+#include "Component.h"
+#include "Camera.h"
+#include "Drawable.h"
+#include <glm/gtc/type_ptr.hpp>
 
 class Mesh: public Drawable {
 public :
@@ -17,12 +20,19 @@ public :
 		GLuint verticesCount;
 	};
 
-	MeshData* const GetMeshData();
+	explicit Mesh(MeshData* meshData);
 
-	Mesh(Mesh::MeshData* meshData);
+	// Gets mesh data
+	MeshData* GetMeshData() const;
 
-	void Draw() override;
+	// Only for setting reference to component which owns this object, 
+	// will not set if component parameter GetDrawable method doesn't return this
+	void SetComponent(Component* component);
+
+	void Draw(Camera* camera) override;
 
 private:
 	MeshData* meshData;
+
+	Component* component;
 };
