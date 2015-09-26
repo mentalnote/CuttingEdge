@@ -28,6 +28,8 @@ Mesh* ResourceManager::LoadMesh (std::string path) {
 		meshData->elements = CreateFlatElementArray(mesh->mFaces, mesh->mNumFaces);
 
 		meshData->vertices = CreateFlatVertexArray(mesh->mVertices, mesh->mNumVertices);
+
+		meshMap[path] = meshData;
 	}
 
 	return new Mesh(meshData);
