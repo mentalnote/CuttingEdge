@@ -31,8 +31,8 @@ const GLchar* fragmentSource =
 "   outColor = colour;"
 "}";
 
-const string barrelPath = "../Resources/Models/bear.obj";
-const string potPath = "../Resources/Models/deer.obj";
+const string bearPath = "../Resources/Models/bear.obj";
+const string deerPath = "../Resources/Models/deer.obj";
 
 ofstream logfile;
 
@@ -146,13 +146,13 @@ Scene* CreateDefaultScene() {
 			for (int k = 0; k < 8; k++){
 				if (k % 2) {
 					string name = "";
-					name = name.append("barrel(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
-					Transform* barrel = defaultScene->CreateTransform(stuffGroup, name);
-					barrel->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
+					name = name.append("bear(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
+					Transform* bear = defaultScene->CreateTransform(stuffGroup, name);
+					bear->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
 
-					if(Mesh* mComponent = ResourceManager::LoadMesh(barrelPath))
+					if(Mesh* mComponent = ResourceManager::LoadMesh(bearPath))
 					{
-						defaultScene->AddComponent(new MeshComponent(barrel, mComponent, name));
+						defaultScene->AddComponent(new MeshComponent(bear, mComponent, name));
 					} else
 					{
 						return nullptr;
@@ -160,13 +160,13 @@ Scene* CreateDefaultScene() {
 				}
 				else {
 					string name = "";
-					name = name.append("pot(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
-					Transform* pot = defaultScene->CreateTransform(stuffGroup, name);
-					pot->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
+					name = name.append("deer(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
+					Transform* deer = defaultScene->CreateTransform(stuffGroup, name);
+					deer->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
 
-					if (Mesh* mComponent = ResourceManager::LoadMesh(potPath))
+					if (Mesh* mComponent = ResourceManager::LoadMesh(deerPath))
 					{
-						defaultScene->AddComponent(new MeshComponent(pot, mComponent, name));
+						defaultScene->AddComponent(new MeshComponent(deer, mComponent, name));
 					}
 					else
 					{
