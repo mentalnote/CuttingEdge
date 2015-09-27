@@ -26,7 +26,7 @@ public :
 	MeshData* GetMeshData() const;
 
 	// Only for setting reference to component which owns this object, 
-	// will not set if component parameter GetDrawable method doesn't return this
+	// will not set component if parameter GetDrawable method doesn't return this
 	void SetComponent(Component* component);
 
 	void Draw(Camera* camera) override;
