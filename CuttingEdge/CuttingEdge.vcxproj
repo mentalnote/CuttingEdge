@@ -88,6 +88,7 @@
     <ClCompile Include="CuttingEdge.cpp" />
     <ClCompile Include="FPSCamera.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="FPSCamera.h" />
     <ClInclude Include="gl_includes.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="Processable.h" />

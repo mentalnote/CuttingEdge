@@ -3,8 +3,9 @@
 MeshComponent::MeshComponent(Transform* transform, Mesh* mesh, std::string name) : Component(transform, name)
 {
 	this->mesh = mesh;
-	this->mesh->SetComponent(this);
-	ResourceManager::BufferMesh(this->mesh->GetMeshData());
+
+	mesh->_SetComponent(this);
+	ResourceManager::BufferMesh(mesh->GetMeshData());
 }
 
 Drawable* MeshComponent::GetDrawable() const
@@ -20,6 +21,6 @@ Processable* MeshComponent::GetProcessable() const
 MeshComponent::~MeshComponent()
 {
 	if (mesh) {
-		delete mesh;
+		free(mesh);
 	}
 }

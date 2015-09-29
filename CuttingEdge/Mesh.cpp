@@ -8,11 +8,9 @@ Mesh::MeshData* Mesh::GetMeshData() const {
 	return this->meshData;
 }
 
-void Mesh::SetComponent(Component * component)
+void Mesh::_SetComponent(Component * component)
 {
-	if (component->GetDrawable() == this) {
-		this->component = component;
-	}
+	this->component = component;
 }
 
 void Mesh::Draw(Camera* camera) {

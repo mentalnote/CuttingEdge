@@ -1,6 +1,10 @@
 #include "Transform.h"
 #include "Component.h"
 
+const glm::vec3 Transform::GlobalForward = glm::vec3(0.0f, 0.0f, -1.0f);
+const glm::vec3 Transform::GlobalUp = glm::vec3(0.0f, 1.0f, 0.0f);
+const glm::vec3 Transform::GlobalRight = glm::vec3(1.0f, 0.0f, 0.0f);
+
 void * Transform::operator new(size_t size)
 {
 	return _aligned_malloc(size, Transform::ALLOC);
@@ -16,13 +20,9 @@ Transform::~Transform()
 	for (Transform* child : this->children) {
 		delete child;
 	}
-
-	for (Component* component : this->components) {
-		delete component;
-	}
 }
 
-Transform::Transform(Transform* parent, std::string name)
+Transform::Transform(Scene* scene, Transform* parent, std::string name)
 {
 	this->parent = parent;
 	if (parent) {
@@ -36,7 +36,7 @@ Transform::Transform(Transform* parent, std::string name)
 	this->dirtyFlags = dirty_All;
 }
 
-Transform::Transform(glm::vec3 position, glm::quat rotation, glm::vec3 scale, Transform* parent, std::string name)
+Transform::Transform(Scene* scene, glm::vec3 position, glm::quat rotation, glm::vec3 scale, Transform* parent, std::string name)
 {
 	this->parent = parent;
 	if (parent) {
@@ -50,11 +50,9 @@ Transform::Transform(glm::vec3 position, glm::quat rotation, glm::vec3 scale, Tr
 	this->dirtyFlags = dirty_All;
 }
 
-void Transform::RemoveComponent(Component * component)
+Scene * Transform::GetScene() const
 {
-	this->components.erase(std::find(this->components.begin(), this->components.end(), component));
-
-	delete component;
+	return this->scene;
 }
 
 Transform * Transform::GetParent() const
@@ -149,7 +147,7 @@ void Transform::SetLocalRotation(glm::quat rotation)
 
 glm::quat Transform::GetWorldRotation()
 {
-	if (!this->dirtyFlags & dirty_Rotation) {
+	if (!(this->dirtyFlags & dirty_Rotation)) {
 		return this->worldRotation;
 	}
 
@@ -191,7 +189,7 @@ void Transform::SetLocalScale(glm::vec3 scale)
 
 glm::vec3 Transform::GetWorldScale()
 {
-	if (!this->dirtyFlags & dirty_Scale) {
+	if (!(this->dirtyFlags & dirty_Scale)) {
 		return this->worldScale;
 	}
 
@@ -231,7 +229,7 @@ glm::vec3 Transform::GetForward()
 
 glm::mat4x4 Transform::GetWorldMatrix()
 {
-	if (!this->dirtyFlags & dirty_Matrix) {
+	if (!(this->dirtyFlags & dirty_Matrix)) {
 		return this->worldMatrix;
 	}
 
@@ -244,6 +242,57 @@ glm::mat4x4 Transform::GetWorldMatrix()
 	this->dirtyFlags &= ~dirty_Matrix;
 
 	return this->worldMatrix;
+}
+
+void Transform::_AddComponent(Component * component)
+{
+	this->components.push_back(component);
+}
+
+void Transform::_RemoveComponent(Component * component)
+{
+	this->components.erase(std::find(this->components.begin(), this->components.end(), component));
+}
+
+std::vector<Component*> Transform::FindAllComponents(int depth)
+{
+	std::vector<Component*> components = std::vector<Component*>();
+
+	for (Component* component : this->components) {
+		components.push_back(component);
+	}
+
+	if (depth) {
+		for (Transform* transform : this->children) {
+			std::vector<Component*> childComponents = transform->FindAllComponents(depth - 1);
+			components.insert(components.end(), childComponents.begin(), childComponents.end());
+		}
+	}
+
+	return components;
+}
+
+template<typename C>
+std::vector<C*> Transform::FindComponents(int depth)
+{
+	std::vector<C*> components = std::vector<C*>();
+
+	for (Component* component : this->components) {
+		C* castComponent = dynamic_cast<C*>(component);
+
+		if (castComponent != nullptr) {
+			components.push_back(castComponent);
+		}
+	}
+
+	if (depth) {
+		for (Transform* transform : this->children) {
+			std::vector<C*> childComponents = transform->FindComponents<C*>(depth - 1);
+			components.insert(components.end(), childComponents.begin(), childComponents.end());
+		}
+	}
+
+	return components;
 }
 
 void Transform::removeChildRef(Transform * child)

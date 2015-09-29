@@ -117,6 +117,9 @@ int main(int argc, char *argv[])
 		//logfile << "|" << to_string(mat[2][0]) << "  " << to_string(mat[2][1]) << "  " << to_string(mat[2][2]) << "  " << to_string(mat[2][3]) << "|\n";
 		//logfile << "|" << to_string(mat[3][0]) << "  " << to_string(mat[3][1]) << "  " << to_string(mat[3][2]) << "  " << to_string(mat[3][3]) << "|\n";
 
+		glm::vec3 pos = scene->GetActiveCamera()->GetTransform()->GetLocalPosition();
+		logfile << to_string(pos.x) << ", " << to_string(pos.y) << ", " << to_string(pos.z) << "\n";
+
 		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 

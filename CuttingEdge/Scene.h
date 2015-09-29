@@ -26,7 +26,6 @@ public:
 
 	Transform* CreateTransform(Transform* parent = nullptr, std::string name = "transform");
 
-
 	void AddComponent(Component* component);
 
 	template <typename C>

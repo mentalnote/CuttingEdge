@@ -4,6 +4,7 @@
 #include <glm\gtc\quaternion.hpp>
 
 class Component;
+class Scene;
 
 class Transform {
 private:
@@ -20,6 +21,7 @@ private:
 
 	std::string name;
 
+	Scene* scene;
 	Transform* parent;
 	std::vector<Transform*> children;
 	std::vector<Component*> components;
@@ -39,17 +41,22 @@ private:
 
 public:
 
-	const glm::vec3 GlobalForward = glm::vec3(0.0f, 0.0f, 1.0f);
-	const glm::vec3 GlobalUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	const static int MAXDEPTH = 10000;
+
+	const static glm::vec3 GlobalForward;
+	const static glm::vec3 GlobalUp;
+	const static glm::vec3 GlobalRight;
 
 	// Will create a transform object parented to the provided transform and with 
 	// default local component values
-	explicit Transform(Transform* parent, std::string name = "Transform");
+	explicit Transform(Scene* scene, Transform* parent, std::string name = "Transform");
 
 	// Will create a transform object parented to the provided transform and will 
 	// set local component values based on provided parameters, parameter values not 
 	// provided will have their corresponding components set to default values
-	explicit Transform(glm::vec3 position = glm::vec3(), glm::quat rotation = glm::quat(), glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f), Transform* parent = nullptr, std::string name = "Transform");
+	explicit Transform(Scene* scene, glm::vec3 position = glm::vec3(), glm::quat rotation = glm::quat(), glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f), Transform* parent = nullptr, std::string name = "Transform");
+
+	Scene* GetScene() const;
 
 	Transform* GetParent() const;
 
@@ -100,8 +107,18 @@ public:
 	// Returns world matrix, first updating it if it's stored value is dirty
 	glm::mat4x4 GetWorldMatrix();
 
-	// Removes a a given component from the transform
-	void RemoveComponent(Component* component);
+	// Internal function wich adds a given component to the transform
+	void _AddComponent(Component* component);
+
+	// Internal function which removes a given component from the transform
+	void _RemoveComponent(Component* component);
+
+	// Find all components up to a given depth in which to traverse children
+	std::vector<Component*> FindAllComponents(int depth = 0);
+
+	// Find all components of given type up to a given depth in which to traverse children
+	template <typename C>
+	std::vector<C*> FindComponents(int depth = 0);
 
 	static void* operator new(size_t size);
 

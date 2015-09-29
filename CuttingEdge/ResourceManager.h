@@ -16,6 +16,11 @@ public:
 	// loads it in first
 	static Mesh* LoadMesh(std::string path);
 
+	// Return MeshData from meshMap,
+	// if MeshData for given path is not in meshMap, 
+	// loads it in first
+	static Mesh::MeshData* LoadMeshData(std::string path);
+
 	// Attempt to upload mesh data to GPU
 	// if mesh data isn't buffered, then generate buffers for it, upload them to the GPU, 
 	// and populate meshData fields (vbo, ebo) with buffer indices and return true

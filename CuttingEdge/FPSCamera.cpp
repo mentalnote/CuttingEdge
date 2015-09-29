@@ -3,7 +3,7 @@
 FPSCamera::FPSCamera(Transform* transform, Camera* camera, std::string name) : Component(transform, name)
 {
 	this->camera;
-	this->processable = (Processable*)this;
+	this->processable = this;
 }
 
 Drawable* FPSCamera::GetDrawable() const
@@ -20,30 +20,30 @@ void FPSCamera::Process()
 {
 	const float speed = 4.0f;
 
-	int forward = 0;
-	int right = 0;
+	float forward = 0.0f;
+	float left = 0.0f;
 
 	if (Input::GetKey(SDL_SCANCODE_W))
 	{
-		forward += 1;
+		forward += 1.0f;
 	}
 
 	if (Input::GetKey(SDL_SCANCODE_S))
 	{
-		forward -= 1;
+		forward -= 1.0f;
 	}
 
 	if (Input::GetKey(SDL_SCANCODE_D))
 	{
-		right += 1;
+		left -= 1.0f;
 	}
 
 	if (Input::GetKey(SDL_SCANCODE_A))
 	{
-		right -= 1;
+		left += 1.0f;
 	}
 
-	this->GetTransform()->SetLocalRotation(glm::rotate(this->GetTransform()->GetLocalRotation(), -right * Time::GetDeltaTime() * speed, this->GetTransform()->GlobalUp));
-	this->GetTransform()->SetLocalPosition(this->GetTransform()->GetLocalPosition() + this->GetTransform()->GetLocalRotation() * glm::vec3(0.0f, 0.0f, -forward) * Time::GetDeltaTime() * speed);
+	this->GetTransform()->SetLocalRotation(glm::rotate(this->GetTransform()->GetLocalRotation(), left * Time::GetDeltaTime() * speed, Transform::GlobalUp));
+	this->GetTransform()->SetLocalPosition(this->GetTransform()->GetLocalPosition() + this->GetTransform()->GetLocalRotation() * Transform::GlobalForward * forward * Time::GetDeltaTime() * speed);
 }
 

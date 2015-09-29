@@ -17,7 +17,7 @@ private:
 
 	ProjectionMode projectionMode;
 
-	
+	Transform* transform;
 
 	glm::mat4 projectionMatrix;
 
@@ -39,7 +39,7 @@ public:
 
 	glm::mat4 GetViewMatrix();
 
-	Transform* transform;
+	Transform* GetTransform();
 
 	ProjectionMode GetProjectionMode() const;
 	void SetProjectionMode(ProjectionMode projectionMode);

@@ -33,7 +33,7 @@ void Scene::SetActiveCamera(Camera * camera)
 
 Transform * Scene::CreateTransform(Transform * parent, std::string name)
 {
-	Transform* newTransform = new Transform(parent, name);
+	Transform* newTransform = new Transform(this, parent, name);
 
 	if (!parent) {
 		rootTransforms.push_back(newTransform);
@@ -87,6 +87,10 @@ void Scene::DeleteTransform(Transform * transform)
 		this->rootTransforms.erase(std::find(this->rootTransforms.begin(), this->rootTransforms.end(), transform));
 	}
 
+	for (Component* component : transform->FindAllComponents(Transform::MAXDEPTH)) {
+		DeleteComponent(component);
+	}
+
 	delete transform;
 }
 
@@ -104,7 +108,7 @@ void Scene::DeleteComponent(Component * component)
 		this->processables.erase(std::find(this->processables.begin(), this->processables.end(), processable));
 	}
 
-	component->GetTransform()->RemoveComponent(component);
+	component->GetTransform()->_RemoveComponent(component);
 
 	delete component;
 }
