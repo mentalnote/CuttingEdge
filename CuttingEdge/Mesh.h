@@ -7,6 +7,8 @@
 #include "Drawable.h"
 #include <glm/gtc/type_ptr.hpp>
 
+class Material;
+
 class Mesh: public Drawable {
 public :
 	struct MeshData {
@@ -18,6 +20,8 @@ public :
 		std::vector<GLfloat> vertices;
 		GLuint elementsCount;
 		GLuint verticesCount;
+		Material* materials;
+		int* offsets;
 	};
 
 	explicit Mesh(MeshData* meshData);

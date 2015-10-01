@@ -33,6 +33,8 @@ const GLchar* fragmentSource =
 
 const string bearPath = "../Resources/Models/bear.obj";
 const string deerPath = "../Resources/Models/deer.obj";
+const string vertPath = "../Resources/Shaders/simple.vert";
+const string fragPath = "../Resources/Shaders/simple.frag";
 
 ofstream logfile;
 
@@ -91,6 +93,8 @@ int main(int argc, char *argv[])
 	Time time = Time();
 	Input input = Input(SDL_GetKeyboardState(nullptr));
 
+	logfile << ResourceManager::LoadShaderSource(vertPath);
+
 	SDL_Event windowEvent;
 	while (true)
 	{
@@ -109,16 +113,6 @@ int main(int argc, char *argv[])
 		time.Tick();
 
 		scene->Process();
-
-		//glm::mat4 mat = scene->GetActiveCamera()->transform->GetWorldMatrix();
-		//logfile << "---------------------------------\n";
-		//logfile << "|" << to_string(mat[0][0]) << "  " << to_string(mat[0][1]) << "  " << to_string(mat[0][2]) << "  " << to_string(mat[0][3]) << "|\n";
-		//logfile << "|" << to_string(mat[1][0]) << "  " << to_string(mat[1][1]) << "  " << to_string(mat[1][2]) << "  " << to_string(mat[1][3]) << "|\n";
-		//logfile << "|" << to_string(mat[2][0]) << "  " << to_string(mat[2][1]) << "  " << to_string(mat[2][2]) << "  " << to_string(mat[2][3]) << "|\n";
-		//logfile << "|" << to_string(mat[3][0]) << "  " << to_string(mat[3][1]) << "  " << to_string(mat[3][2]) << "  " << to_string(mat[3][3]) << "|\n";
-
-		glm::vec3 pos = scene->GetActiveCamera()->GetTransform()->GetLocalPosition();
-		logfile << to_string(pos.x) << ", " << to_string(pos.y) << ", " << to_string(pos.z) << "\n";
 
 		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -184,6 +178,7 @@ Scene* CreateDefaultScene() {
 }
 
 int Cleanup(SDL_GLContext context) {
+	delete scene;
 	logfile.close();
 	SDL_GL_DeleteContext(context);
 	SDL_Quit();

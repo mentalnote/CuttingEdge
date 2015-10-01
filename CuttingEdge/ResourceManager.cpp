@@ -1,8 +1,15 @@
 #include "ResourceManager.h"
+#include <fstream>
 
 Assimp::Importer* ResourceManager::importer = new Assimp::Importer();
 
 std::unordered_map<std::string, Mesh::MeshData*> ResourceManager::meshMap = std::unordered_map<std::string, Mesh::MeshData*>();
+
+std::unordered_map<std::string, Texture*> ResourceManager::textureMap = std::unordered_map<std::string, Texture*>();
+
+std::unordered_map<std::string, ShaderProgram::Shader*> ResourceManager::shaderMap = std::unordered_map<std::string, ShaderProgram::Shader*>();
+
+std::unordered_map<std::string, ShaderProgram*> ResourceManager::shaderProgramMap = std::unordered_map<std::string, ShaderProgram*>();
 
 Mesh* ResourceManager::LoadMesh (std::string path) {
 	return new Mesh(LoadMeshData(path));
@@ -21,6 +28,14 @@ Mesh::MeshData* ResourceManager::LoadMeshData(std::string path)
 
 		if (modelData == nullptr) {
 			return nullptr;
+		}	
+
+		// TODO: Add option for flattening redundant vertices across sub meshes
+		GLuint sizeCounter = 0;
+
+		for (int i = 0; i < modelData->mNumMeshes; i++)
+		{
+			sizeCounter += modelData->mMeshes[i]->mNumVertices;
 		}
 
 		aiMesh* mesh = modelData->mMeshes[0];
@@ -28,6 +43,8 @@ Mesh::MeshData* ResourceManager::LoadMeshData(std::string path)
 		meshData->verticesCount = mesh->mNumVertices * 3;
 
 		meshData->elementsCount = mesh->mNumFaces * 3;
+
+		modelData->mMaterials[0]->mProperties[0]->mSemantic;
 
 		meshData->elements = CreateFlatElementArray(mesh->mFaces, mesh->mNumFaces);
 
@@ -60,7 +77,7 @@ bool ResourceManager::BufferMesh(Mesh::MeshData* meshData) {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * meshData->vertices.size(), meshData->vertices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	// Create an element array
 	glGenBuffers(1, &(meshData->ebo));
@@ -77,6 +94,97 @@ bool ResourceManager::BufferMesh(Mesh::MeshData* meshData) {
 	meshData->vertices.clear();
 
 	return true;
+}
+
+bool ResourceManager::CompileShaderProgram(ShaderProgram* program)
+{
+	if(shaderProgramMap[program->name] != nullptr)
+	{
+		return false;
+	}
+
+	program->programId = glCreateProgram();
+
+	for(ShaderProgram::Shader* shader : program->shaders)
+	{
+		glAttachShader(program->programId, shader->id);
+	}
+
+	shaderProgramMap[program->name] = program;
+
+	return true;
+}
+
+ShaderProgram* ResourceManager::GetShaderProgram(std::string name)
+{
+	return shaderProgramMap[name];
+}
+
+Texture* ResourceManager::LoadTexture(std::string path)
+{
+	return new Texture();
+}
+
+ShaderProgram::Shader* ResourceManager::LoadShaderSource(std::string path)
+{
+	ShaderProgram::Shader* shader = shaderMap[path];
+
+	if (shader == nullptr)
+	{
+		shader = new ShaderProgram::Shader();
+
+		std::string extension = path.substr(path.find_last_of('.') + 1);
+
+		if (extension == ShaderProgram::VERT_EXTENSION)
+		{
+			shader->type = GL_VERTEX_SHADER;
+		}
+		else if (extension == ShaderProgram::FRAG_EXTENSION)
+		{
+			shader->type = GL_FRAGMENT_SHADER;
+		}
+		else if (extension == ShaderProgram::GEOM_EXTENSION)
+		{
+			shader->type = GL_GEOMETRY_SHADER;
+		}
+
+		std::ifstream sourceStream(path, std::ios::ate | std::ios::binary);
+
+		size_t size = sourceStream.tellg();
+		shader->source = new GLchar[size + 1];
+		sourceStream.seekg(0);
+		sourceStream.read(shader->source, size);
+		shader->source[size] = '\0';
+
+		shaderMap[path] = shader;
+	}
+
+	return shader;
+}
+
+bool ResourceManager::CompileShader(ShaderProgram::Shader* shader)
+{
+	ShaderProgram::Shader* storedShader = shaderMap[shader->path];
+
+	if(storedShader == nullptr || storedShader->id)
+	{
+		return false;
+	}
+
+	storedShader->id = glCreateShader(shader->type);
+	glShaderSource(storedShader->id, 1, &(shader->source), NULL);
+	glCompileShader(storedShader->id);
+
+	return true;
+}
+
+ShaderProgram::Shader* ResourceManager::LoadShader(std::string path)
+{
+	ShaderProgram::Shader* shader = LoadShaderSource(path);
+
+	CompileShader(shader);
+
+	return shader;
 }
 
 std::vector<GLfloat> ResourceManager::CreateFlatVertexArray(aiVector3D* vertices, unsigned int numVerts) {

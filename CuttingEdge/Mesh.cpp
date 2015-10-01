@@ -2,6 +2,7 @@
 
 Mesh::Mesh(MeshData* meshData) {
 	this->meshData = meshData;
+	this->component = nullptr;
 }
 
 Mesh::MeshData* Mesh::GetMeshData() const {
@@ -14,7 +15,7 @@ void Mesh::_SetComponent(Component * component)
 }
 
 void Mesh::Draw(Camera* camera) {
-	glBindVertexArray(this->meshData->vao);	
+	glBindVertexArray(this->meshData->vao);
 
 	glm::mat4 MVP = camera->GetProjectionMatrix() * camera->GetViewMatrix() * this->component->GetTransform()->GetWorldMatrix();
 

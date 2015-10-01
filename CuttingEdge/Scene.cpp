@@ -5,6 +5,7 @@ Scene::Scene()
 	this->rootTransforms = std::vector<Transform*>();
 	this->drawables = std::unordered_set<Drawable*>();
 	this->processables = std::unordered_set<Processable*>();
+	this->activeCamera = nullptr;
 }
 
 void Scene::Process()
@@ -69,13 +70,13 @@ C* Scene::CreateComponent(Transform * transform, std::string name)
 	Drawable* drawable = newComponent->GetDrawable();
 
 	if (drawable) {
-		this->drawables.push_back(drawable);
+		this->drawables.insert(drawable);
 	}
 
 	Processable* processable = newComponent->GetProcessable();
 
 	if (processable) {
-		this->processables.push_back(processable);
+		this->processables.insert(processable);
 	}
 
 	return newComponent;
