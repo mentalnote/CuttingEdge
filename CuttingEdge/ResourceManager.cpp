@@ -43,10 +43,13 @@ Mesh::MeshData* ResourceManager::LoadMeshData(std::string path)
 		meshData->verticesCount = mesh->mNumVertices * 3;
 
 		meshData->elementsCount = mesh->mNumFaces * 3;
-
-		modelData->mMaterials[0]->mProperties[0]->mSemantic;
-
+		
 		meshData->elements = CreateFlatElementArray(mesh->mFaces, mesh->mNumFaces);
+
+		/*if (mesh->HasNormals() && mesh->HasVertexColors(0) {
+
+		}*/
+
 
 		meshData->vertices = CreateFlatVertexArray(mesh->mVertices, mesh->mNumVertices);
 

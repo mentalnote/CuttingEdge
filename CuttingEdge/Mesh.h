@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Drawable.h"
 #include <glm/gtc/type_ptr.hpp>
+#include "Vertex.h"
 
 class Material;
 
@@ -17,7 +18,7 @@ public :
 		GLuint vbo;
 		GLuint ebo;
 		std::vector<GLuint> elements;
-		std::vector<GLfloat> vertices;
+		std::vector<Vertex> vertices;
 		GLuint elementsCount;
 		GLuint verticesCount;
 		Material* materials;
