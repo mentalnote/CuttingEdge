@@ -50,8 +50,7 @@ Mesh::MeshData* ResourceManager::LoadMeshData(std::string path)
 
 		}*/
 
-
-		meshData->vertices = CreateFlatVertexArray(mesh->mVertices, mesh->mNumVertices);
+		meshData->vertices = CreateFlatVertexArray(mesh);
 
 		meshData->path = path;
 
@@ -190,16 +189,30 @@ ShaderProgram::Shader* ResourceManager::LoadShader(std::string path)
 	return shader;
 }
 
-std::vector<GLfloat> ResourceManager::CreateFlatVertexArray(aiVector3D* vertices, unsigned int numVerts) {
-	std::vector<GLfloat> flatVertices = std::vector<GLfloat>(numVerts * 3);
+std::vector<Vertex> ResourceManager::CreateFlatVertexArray(aiMesh* mesh) {
+	std::vector<Vertex> flatVertices = std::vector<Vertex>(mesh->mNumVertices);
 
-	for (unsigned int i = 0; i < numVerts; i++) {
+	for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
 
-		int index = i * 3;
+		aiVector3D pos = mesh->mVertices[i];
 
-		flatVertices[index] = vertices[i].x;
-		flatVertices[index + 1] = vertices[i].y;
-		flatVertices[index + 2] = vertices[i].z;
+		if(mesh->HasNormals() && mesh->HasVertexColors(0))
+		{
+			aiVector3D normal = mesh->mNormals[i];
+			aiColor4D* color = mesh->mColors[i];
+			flatVertices[i] = Vertex(glm::vec3(pos.x, pos.y, pos.z), glm::vec3(normal.x, normal.y, normal.z), glm::vec3(color->r, color->g, color->b));
+		} else if(mesh->HasNormals())
+		{
+			aiVector3D normal = mesh->mNormals[i];
+			flatVertices[i] = Vertex(glm::vec3(pos.x, pos.y, pos.z), glm::vec3(normal.x, normal.y, normal.z));
+		} else if(mesh->HasVertexColors(0))
+		{
+			aiColor4D* color = mesh->mColors[i];
+			flatVertices[i] = Vertex(glm::vec3(pos.x, pos.y, pos.z), glm::vec3(), glm::vec3(color->r, color->g, color->b));
+		} else
+		{
+			flatVertices[i] = Vertex(glm::vec3(pos.x, pos.y, pos.z));
+		}
 	}
 
 	return flatVertices;

@@ -54,7 +54,7 @@ private:
 	static std::unordered_map<std::string, ShaderProgram*> shaderProgramMap;
 
 	//Generate flat array for vertex buffer from array of vertex vectors
-	static std::vector<GLfloat> CreateFlatVertexArray(aiVector3D* vertices, unsigned int numVerts);
+	static std::vector<Vertex> CreateFlatVertexArray(aiMesh* mesh);
 
 	//Generate flat array for element buffer from array of element vectors
 	static std::vector<GLuint> CreateFlatElementArray(aiFace* elements, unsigned int numElems);
