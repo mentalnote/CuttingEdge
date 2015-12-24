@@ -9,6 +9,6 @@ class RenderLayer {
 
 	int depth;
 
-	std::unordered_map<>* inTargets;
-	std::unordered_map<>* outTargets;
+	//std::unordered_map<>* inTargets;
+	//std::unordered_map<>* outTargets;
 };
