@@ -92,7 +92,13 @@ bool ResourceManager::BufferMesh(Mesh::MeshData* meshData) {
 	glBufferData(GL_ARRAY_BUFFER, Vertex::SIZE * meshData->vertices.size(), (GLfloat*)meshData->vertices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Vertex::SIZE, nullptr);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Vertex::SIZE, (void*)(sizeof(GLfloat) * 3));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, Vertex::SIZE, (void*)(sizeof(GLfloat) * 6));
 
 	// Create an element array
 	glGenBuffers(1, &(meshData->ebo));

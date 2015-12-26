@@ -25,6 +25,10 @@ public :
 		Material* material;
 	};
 
+	static std::string const POS_ATTRIB_NAME;
+	static std::string const NORMAL_ATTRIB_NAME;
+	static std::string const COLOR_ATTRIB_NAME;
+
 	explicit Mesh(MeshData* meshData);
 
 	// Gets mesh data
