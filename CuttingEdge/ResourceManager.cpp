@@ -3,7 +3,7 @@
 
 Assimp::Importer* ResourceManager::importer = new Assimp::Importer();
 
-std::unordered_map<std::string, Mesh::MeshData*> ResourceManager::meshMap = std::unordered_map<std::string, Mesh::MeshData*>();
+std::unordered_map<std::string, std::pair<Mesh::MeshData**, int>> ResourceManager::meshMap = std::unordered_map<std::string, std::pair<Mesh::MeshData**, int>>();
 
 std::unordered_map<std::string, Texture*> ResourceManager::textureMap = std::unordered_map<std::string, Texture*>();
 
@@ -11,48 +11,61 @@ std::unordered_map<std::string, ShaderProgram::Shader*> ResourceManager::shaderM
 
 std::unordered_map<std::string, ShaderProgram*> ResourceManager::shaderProgramMap = std::unordered_map<std::string, ShaderProgram*>();
 
-Mesh* ResourceManager::LoadMesh (std::string path) {
-	return new Mesh(LoadMeshData(path));
+std::pair<Mesh**, int> ResourceManager::LoadMesh (std::string path) {
+	std::pair<Mesh**, int> meshes = std::pair<Mesh**, int>();
+	
+	std::pair<Mesh::MeshData**, int> meshData = LoadMeshData(path);
+
+	if (meshData.first == nullptr) {
+		return meshes;
+	}
+
+	meshes.first = new Mesh*[meshData.second];
+	meshes.second = meshData.second;
+
+	for (int i = 0; i < meshData.second; i++) {
+		meshes.first[i] = new Mesh(meshData.first[i]);
+	}
+
+	return meshes;
 }
 
-Mesh::MeshData* ResourceManager::LoadMeshData(std::string path)
+std::pair<Mesh::MeshData**, int> ResourceManager::LoadMeshData(std::string path)
 {
-	Mesh::MeshData* meshData = meshMap[path];
+	std::pair<Mesh::MeshData**, int> meshData = meshMap[path];
 
-	if (meshData == nullptr) {
-		meshData = new Mesh::MeshData();
+	if (meshData.first == nullptr) {
+		meshData = std::pair<Mesh::MeshData**, int>();
 
 		const struct aiScene* modelData;
 
 		modelData = importer->ReadFile(path, aiProcess_Triangulate);
 
 		if (modelData == nullptr) {
-			return nullptr;
+			return meshData;
 		}	
 
-		// TODO: Add option for flattening redundant vertices across sub meshes
-		GLuint sizeCounter = 0;
+		Mesh::MeshData** meshes = new Mesh::MeshData*[modelData->mNumMeshes];
+		meshData.second = modelData->mNumMeshes;
 
-		for (int i = 0; i < modelData->mNumMeshes; i++)
+		for (unsigned int i = 0; i < modelData->mNumMeshes; i++)
 		{
-			sizeCounter += modelData->mMeshes[i]->mNumVertices;
+			aiMesh* mesh = modelData->mMeshes[i];
+
+			meshes[i] = new Mesh::MeshData();
+
+			meshes[i]->verticesCount = mesh->mNumVertices * 3;
+
+			meshes[i]->elementsCount = mesh->mNumFaces * 3;
+
+			meshes[i]->elements = CreateFlatElementArray(mesh->mFaces, mesh->mNumFaces);
+
+			meshes[i]->vertices = CreateFlatVertexArray(mesh);
+
+			meshes[i]->path = path;
 		}
 
-		aiMesh* mesh = modelData->mMeshes[0];
-
-		meshData->verticesCount = mesh->mNumVertices * 3;
-
-		meshData->elementsCount = mesh->mNumFaces * 3;
-		
-		meshData->elements = CreateFlatElementArray(mesh->mFaces, mesh->mNumFaces);
-
-		/*if (mesh->HasNormals() && mesh->HasVertexColors(0) {
-
-		}*/
-
-		meshData->vertices = CreateFlatVertexArray(mesh);
-
-		meshData->path = path;
+		meshData.first = meshes;
 
 		meshMap[path] = meshData;
 	}
@@ -74,9 +87,9 @@ bool ResourceManager::BufferMesh(Mesh::MeshData* meshData) {
 
 	// Create a Vertex Buffer Object and copy the vertex data to it
 	glGenBuffers(1, &(meshData->vbo));
-
+	 
 	glBindBuffer(GL_ARRAY_BUFFER, meshData->vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * meshData->vertices.size(), meshData->vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, Vertex::SIZE * meshData->vertices.size(), (GLfloat*)meshData->vertices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);

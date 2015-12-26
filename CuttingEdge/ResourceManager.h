@@ -16,12 +16,12 @@ public:
 	// Return new Mesh created with MeshData from meshMap, 
 	// if MeshData for given path is not in meshMap, 
 	// loads it in first
-	static Mesh* LoadMesh(std::string path);
+	static std::pair<Mesh**, int> LoadMesh(std::string path);
 
 	// Return MeshData from meshMap,
 	// if MeshData for given path is not in meshMap, 
 	// loads it in first
-	static Mesh::MeshData* LoadMeshData(std::string path);
+	static std::pair<Mesh::MeshData**, int> LoadMeshData(std::string path);
 
 	// Attempt to upload mesh data to GPU
 	// if mesh data isn't buffered, then generate buffers for it, upload them to the GPU, 
@@ -45,7 +45,7 @@ private:
 	static Assimp::Importer* importer;
 
 	// unordered_map which stores data necessary to buffer and draw meshes
-	static std::unordered_map<std::string, Mesh::MeshData*> meshMap;
+	static std::unordered_map<std::string, std::pair<Mesh::MeshData**, int>> meshMap;
 
 	static std::unordered_map<std::string, Texture*> textureMap;
 

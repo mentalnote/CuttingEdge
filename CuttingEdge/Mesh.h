@@ -14,6 +14,7 @@ class Mesh: public Drawable {
 public :
 	struct MeshData {
 		std::string path;
+		std::string name;
 		GLuint vao;
 		GLuint vbo;
 		GLuint ebo;
@@ -21,8 +22,7 @@ public :
 		std::vector<Vertex> vertices;
 		GLuint elementsCount;
 		GLuint verticesCount;
-		Material* materials;
-		int* offsets;
+		Material* material;
 	};
 
 	explicit Mesh(MeshData* meshData);

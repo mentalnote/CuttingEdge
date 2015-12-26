@@ -160,9 +160,13 @@ Scene* CreateDefaultScene() {
 					Transform* bear = defaultScene->CreateTransform(stuffGroup, name);
 					bear->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
 
-					if(Mesh* mComponent = ResourceManager::LoadMesh(bearPath))
+					std::pair<Mesh**, int> mComponent = ResourceManager::LoadMesh(bearPath);
+
+					if(mComponent.second)
 					{
-						defaultScene->AddComponent(new MeshComponent(bear, mComponent, name));
+						for (int l = 0; l < mComponent.second; l++) {
+							defaultScene->AddComponent(new MeshComponent(bear, mComponent.first[l], name));
+						}
 					} else
 					{
 						return nullptr;
@@ -174,9 +178,13 @@ Scene* CreateDefaultScene() {
 					Transform* deer = defaultScene->CreateTransform(stuffGroup, name);
 					deer->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
 
-					if (Mesh* mComponent = ResourceManager::LoadMesh(deerPath))
+					std::pair<Mesh**, int> mComponent = ResourceManager::LoadMesh(deerPath);
+
+					if (mComponent.second)
 					{
-						defaultScene->AddComponent(new MeshComponent(deer, mComponent, name));
+						for (int l = 0; l < mComponent.second; l++) {
+							defaultScene->AddComponent(new MeshComponent(deer, mComponent.first[l], name));
+						}
 					}
 					else
 					{
