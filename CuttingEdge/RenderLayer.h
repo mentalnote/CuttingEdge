@@ -1,14 +1,42 @@
 #pragma once
 #include <unordered_map>
-
-
-class RenderTechnique;
+#include <vector>
+#include "gl_includes.h"
+#include <string>
+#include "Scene.h"
 
 class RenderLayer {
-	RenderTechnique* technique;
+public:
+	struct TexBuffer
+	{
+		std::string name;
+		GLuint Buffer;
+		GLenum Target;
+		GLint InternalFormat;
+		GLenum Format;
+		GLsizei Width;
+		GLsizei Height;
+		GLint Level;
+		GLint Border;
+		GLenum DataType;
+		const GLvoid* Data;
+	};
 
-	int depth;
+protected:
+	std::vector<TexBuffer*> inputBufferReqs;
+	std::vector<TexBuffer*> inputBuffers;
+	std::vector<TexBuffer*> outputBuffers;
+	GLuint frameBuffer;
+	GLuint stencilBuffer;
 
-	//std::unordered_map<>* inTargets;
-	//std::unordered_map<>* outTargets;
+public:
+	void Initialize(std::vector<TexBuffer*> inputBuffers);
+
+	std::vector<TexBuffer*> GetRequiredInputs();
+
+	std::vector<TexBuffer*> GetOutputBuffers();
+
+	virtual void Render(Scene* scene) = 0;
+
+	virtual ~RenderLayer() = 0 {};
 };

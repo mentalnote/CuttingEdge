@@ -89,18 +89,6 @@ int main(int argc, char *argv[])
 	glLinkProgram(shaderProgram);
 	glUseProgram(shaderProgram);
 
-	Vertex* vertex = new Vertex(glm::vec3(1.0f,2.0f,3.0f), glm::vec3(-1.0f, -2.0f, -3.0f), glm::vec3(5.0f, 25.0f, 34.0f));
-
-	logfile << "Vertex Memory: [";
-	for (int i = 0; i < 9; i++) {
-		logfile << *((float*)vertex + i);
-		if(i != 8) {
-			logfile << ", ";
-		}	
-	}
-	
-	logfile << "]\n";
-
 	logfile << "ERROR: " << glGetError() << "\n";
 
 	Time time = Time();
