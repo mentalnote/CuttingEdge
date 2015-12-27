@@ -25,7 +25,7 @@ public:
 
 	GLuint programId;
 
-	std::unordered_map<std::string, std::tuple<GLint, GLuint>> propertyMap;
+	std::unordered_map<std::string, GLuint> propertyMap;
 
 	explicit ShaderProgram(std::string name);
 };

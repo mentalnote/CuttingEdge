@@ -8,7 +8,6 @@
 #include "Scene.h"
 #include "FPSCamera.h"
 #include "MeshComponent.h"
-#include "Vertex.h"
 
 
 using namespace std;
@@ -82,6 +81,7 @@ int main(int argc, char *argv[])
 
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
+
 	glBindFragDataLocation(shaderProgram, 0, "outColor");
 
 	matrixID = glGetUniformLocation(shaderProgram, "MVP"); ;
@@ -93,8 +93,6 @@ int main(int argc, char *argv[])
 
 	Time time = Time();
 	Input input = Input(SDL_GetKeyboardState(nullptr));
-
-	logfile << ResourceManager::LoadShaderSource(vertPath);
 
 	SDL_Event windowEvent;
 	while (true)

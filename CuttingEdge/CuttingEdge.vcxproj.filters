@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Processables">
       <UniqueIdentifier>{6637feaa-3d6e-4be9-9d09-7c95cfd2686a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{ef9e2205-b34f-45ef-9874-516c3e48bfa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{2b4b915e-bfe7-4f3e-ac61-d0eceed3d50a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -131,9 +131,32 @@ bool ResourceManager::CompileShaderProgram(ShaderProgram* program)
 		glAttachShader(program->programId, shader->id);
 	}
 
+	glLinkProgram(program->programId);
+
+	GLint isLinked = 0;
+	glGetProgramiv(program->programId, GL_LINK_STATUS, (int *)&isLinked);
+
+	GLint numBlocks;
+	glGetProgramiv(program->programId, GL_ACTIVE_UNIFORMS, &numBlocks);
+
+	GLint nameLen;
+	glGetProgramiv(program->programId, GL_ACTIVE_UNIFORM_MAX_LENGTH, &nameLen);
+
+	std::vector<GLchar> name;
+	name.resize(nameLen);
+
+	for (int blockIx = 0; blockIx < numBlocks; ++blockIx)
+	{
+		GLint size;
+		GLenum type;
+		glGetActiveUniform(program->programId, blockIx, nameLen, NULL, &size, &type, &name[0]);
+
+		program->propertyMap[std::string(&name[0])] = type;
+	}
+
 	shaderProgramMap[program->name] = program;
 
-	return true;
+	return isLinked;
 }
 
 ShaderProgram* ResourceManager::GetShaderProgram(std::string name)
@@ -153,6 +176,8 @@ ShaderProgram::Shader* ResourceManager::LoadShaderSource(std::string path)
 	if (shader == nullptr)
 	{
 		shader = new ShaderProgram::Shader();
+
+		shader->path = path;
 
 		std::string extension = path.substr(path.find_last_of('.') + 1);
 
@@ -189,7 +214,7 @@ bool ResourceManager::CompileShader(ShaderProgram::Shader* shader)
 
 	if(storedShader == nullptr || storedShader->id)
 	{
-		return false;
+		return storedShader->id;
 	}
 
 	storedShader->id = glCreateShader(shader->type);

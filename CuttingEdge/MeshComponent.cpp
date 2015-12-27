@@ -1,5 +1,15 @@
 #include "MeshComponent.h"
 
+void MeshComponent::SetMaterial(Material* material)
+{
+	this->mesh->material = material;
+}
+
+Material* MeshComponent::GetMaterial()
+{
+	return this->mesh->GetMaterial();
+}
+
 MeshComponent::MeshComponent(Transform* transform, Mesh* mesh, std::string name) : Component(transform, name)
 {
 	this->mesh = mesh;

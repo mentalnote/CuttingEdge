@@ -4,11 +4,13 @@
 #include "ResourceManager.h"
 
 class MeshComponent : public Component {
-private:
 	Mesh* mesh;
 
 public:
 	MeshComponent(Transform* transform, Mesh* mesh, std::string name = "MeshComponent");
+
+	void SetMaterial(Material* material);
+	Material* GetMaterial();
 
 	Drawable* GetDrawable() const override;
 	Processable* GetProcessable() const override;

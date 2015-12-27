@@ -7,8 +7,7 @@
 #include "Drawable.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "Vertex.h"
-
-class Material;
+#include "Material.h"
 
 class Mesh: public Drawable {
 public :
@@ -29,10 +28,14 @@ public :
 	static std::string const NORMAL_ATTRIB_NAME;
 	static std::string const COLOR_ATTRIB_NAME;
 
+	Material* material;
+
 	explicit Mesh(MeshData* meshData);
 
 	// Gets mesh data
 	MeshData* GetMeshData() const;
+
+	Material* GetMaterial() override;
 
 	// Internal function only for setting reference to component which owns this object
 	void _SetComponent(Component* component);
