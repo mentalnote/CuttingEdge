@@ -158,5 +158,8 @@
     <ClInclude Include="Vertex.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="guicon.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

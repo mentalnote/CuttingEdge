@@ -4,6 +4,8 @@ float Time::deltaTime = 0.0f;
 long long Time::currentTime = 0;
 Time* Time::instance = nullptr;
 
+std::unordered_map<std::string, long long> Time::flags = std::unordered_map<std::string, long long>();
+
 Time::Time()
 {
 	if(instance != nullptr)
@@ -34,12 +36,18 @@ float Time::GetDeltaTime()
 	return deltaTime;
 }
 
-void Time::LogFlag(std::string flag)
+float Time::Flag(std::string flag)
 {
 	long long cTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-	std::cout << Time::flag << ": " << (cTime - flagTime) / 1000.0f << "\n";
+	if(!flags.count(flag))
+	{
+		flags[flag] = cTime;
+		return 0.0f;
+	}
 
-	Time::flag = flag;
-	flagTime = cTime;
+	float dTime = (cTime - flags[flag]) / 1000.0f;
+	flags[flag] = cTime;
+
+	return dTime;
 }

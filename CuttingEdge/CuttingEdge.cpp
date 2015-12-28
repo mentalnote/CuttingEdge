@@ -10,8 +10,7 @@
 #include "Scene.h"
 #include "FPSCamera.h"
 #include "MeshComponent.h"
-
-
+#include "guicon.h"
 
 using namespace std;
 
@@ -38,8 +37,9 @@ const string bearPath = "../Resources/Models/bear.obj";
 const string deerPath = "../Resources/Models/deer.obj";
 const string vertPath = "../Resources/Shaders/simple.vert";
 const string fragPath = "../Resources/Shaders/simple.frag";
+const string SIMPLE_SHADER = "simple";
 
-ofstream logfile;
+//ofstream logfile;
 
 Scene* scene;
 
@@ -49,10 +49,9 @@ Scene* CreateDefaultScene();
 
 int main(int argc, char *argv[])
 {
-	logfile.open("../log.txt");
+	//logfile.open("../log.txt");
 
-	std::streambuf* sbuf = std::cout.rdbuf();
-	std::cout.rdbuf(logfile.rdbuf());
+	RedirectIOToConsole();
 
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -65,6 +64,18 @@ int main(int argc, char *argv[])
 
 	glewInit();
 
+	glFrontFace(GL_CW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	ShaderProgram* program = new ShaderProgram(SIMPLE_SHADER);
+
+	program->shaders.push_back(ResourceManager::LoadShader(vertPath));
+	program->shaders.push_back(ResourceManager::LoadShader(fragPath));
+
+	ResourceManager::CompileShaderProgram(program);
+
 	scene = CreateDefaultScene();
 
 	if(scene == nullptr)
@@ -72,15 +83,6 @@ int main(int argc, char *argv[])
 		Cleanup(context);
 		return 0;
 	}
-
-	ShaderProgram* program = new ShaderProgram("simple");
-
-	program->shaders.push_back(ResourceManager::LoadShader(vertPath));
-	program->shaders.push_back(ResourceManager::LoadShader(fragPath));
-
-	ResourceManager::CompileShaderProgram(program);
-
-	Material* material = new Material(program);
 
 	cout << "ERROR: " << glGetError() << "\n";
 
@@ -101,14 +103,17 @@ int main(int argc, char *argv[])
 		{
 			input.SetInputEvent(nullptr);
 		}
-
+		
+		cout << Time::GetDeltaTime() << "\n";
 		time.Tick();
 		scene->Process();
 
 		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		scene->Draw(material);
+		scene->Draw();
+
+		glFinish();
 
 		SDL_GL_SwapWindow(window);
 	}
@@ -129,21 +134,25 @@ Scene* CreateDefaultScene() {
 
 	Transform* stuffGroup = defaultScene->CreateTransform(nullptr, "Animals");
 
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 8; j++) {
-			for (int k = 0; k < 8; k++){
+	int cSize = 6;
+
+	for (int i = 0; i < cSize; i++) {
+		for (int j = 0; j < cSize; j++) {
+			for (int k = 0; k < cSize; k++){
 				if (k % 2) {
 					string name = "";
 					name = name.append("bear(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
 					Transform* bear = defaultScene->CreateTransform(stuffGroup, name);
-					bear->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
+					bear->SetLocalPosition(glm::vec3(i - cSize * 0.5, j - cSize * 0.5, k - cSize * 0.5));
 
 					std::pair<Mesh**, int> mComponent = ResourceManager::LoadMesh(bearPath);
 
 					if(mComponent.second)
 					{
 						for (int l = 0; l < mComponent.second; l++) {
-							defaultScene->AddComponent(new MeshComponent(bear, mComponent.first[l], name));
+							MeshComponent* meshComponent = new MeshComponent(bear, mComponent.first[l], name);
+							meshComponent->SetMaterial(new Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER)));
+							defaultScene->AddComponent(meshComponent);
 						}
 					} else
 					{
@@ -154,14 +163,16 @@ Scene* CreateDefaultScene() {
 					string name = "";
 					name = name.append("deer(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
 					Transform* deer = defaultScene->CreateTransform(stuffGroup, name);
-					deer->SetLocalPosition(glm::vec3(i - 4, j - 4, k - 4));
+					deer->SetLocalPosition(glm::vec3(i - cSize * 0.5, j - cSize * 0.5, k - cSize * 0.5));
 
 					std::pair<Mesh**, int> mComponent = ResourceManager::LoadMesh(deerPath);
 
 					if (mComponent.second)
 					{
 						for (int l = 0; l < mComponent.second; l++) {
-							defaultScene->AddComponent(new MeshComponent(deer, mComponent.first[l], name));
+							MeshComponent* meshComponent = new MeshComponent(deer, mComponent.first[l], name);
+							meshComponent->SetMaterial(new Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER)));
+							defaultScene->AddComponent(meshComponent);
 						}
 					}
 					else
@@ -178,7 +189,7 @@ Scene* CreateDefaultScene() {
 
 int Cleanup(SDL_GLContext context) {
 	delete scene;
-	logfile.close();
+	//logfile.close();
 	SDL_GL_DeleteContext(context);
 	SDL_Quit();
 	return 0;

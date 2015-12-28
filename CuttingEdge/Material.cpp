@@ -15,12 +15,22 @@ Material::Material(ShaderProgram* shader)
 
 void Material::Bind()
 {
+	if(Material::boundProgram == this->shader->programId)
+	{
+		return;
+	}
+
 	glUseProgram(this->shader->programId);
 	Material::boundProgram = this->shader->programId;
 }
 
 void Material::Unbind()
 {
+	if (Material::boundProgram == 0)
+	{
+		return;
+	}
+
 	glUseProgram(0);
 	Material::boundProgram = 0;
 }

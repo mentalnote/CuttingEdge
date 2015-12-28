@@ -107,6 +107,7 @@
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="FPSCamera.h" />
     <ClInclude Include="gl_includes.h" />
+    <ClInclude Include="guicon.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />

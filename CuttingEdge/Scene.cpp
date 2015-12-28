@@ -1,4 +1,6 @@
 #include "Scene.h"
+#include <iostream>
+#include "Time.h"
 
 Scene::Scene()
 {
@@ -33,15 +35,17 @@ void Scene::Draw()
 void Scene::Draw(Material* material)
 {
 	material->Bind();
+	int c = 0;
 
 	for (Drawable* drawable : this->drawables) {
-		glm::mat4 mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera);
 
+		glm::mat4 mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera);
 		material->SetUniform(Material::PropertyType::MAT4, "MVP", &mvp[0][0]);
 
 		drawable->Draw();
+		c++;
 	}
-
+	
 	material->Unbind();
 }
 
