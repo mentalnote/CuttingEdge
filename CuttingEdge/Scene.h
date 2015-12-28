@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Drawable.h"
 #include "Processable.h"
+#include "Material.h"
 
 class Scene {
 private:
@@ -20,6 +21,7 @@ public:
 	void Process();
 
 	void Draw();
+	void Draw(Material* material);
 
 	Camera* GetActiveCamera() const;
 	void SetActiveCamera(Camera* camera);

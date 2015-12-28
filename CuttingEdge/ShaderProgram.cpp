@@ -11,5 +11,5 @@ ShaderProgram::ShaderProgram(std::string name)
 
 	this->shaders = std::vector<Shader*>();
 
-	this->propertyMap = std::unordered_map<std::string, GLuint>();
+	this->propertyMap = std::unordered_map<std::string, std::pair<GLuint, GLuint>>();
 }

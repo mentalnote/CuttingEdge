@@ -33,3 +33,13 @@ float Time::GetDeltaTime()
 {
 	return deltaTime;
 }
+
+void Time::LogFlag(std::string flag)
+{
+	long long cTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+	std::cout << Time::flag << ": " << (cTime - flagTime) / 1000.0f << "\n";
+
+	Time::flag = flag;
+	flagTime = cTime;
+}

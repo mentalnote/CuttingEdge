@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include "Component.h"
-#include "Camera.h"
 #include "Drawable.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "Vertex.h"
@@ -38,9 +37,11 @@ public :
 	Material* GetMaterial() override;
 
 	// Internal function only for setting reference to component which owns this object
-	void _SetComponent(Component* component);
+	void _SetComponent(Component* component) override;
 
-	void Draw(Camera* camera) override;
+	Component* GetComponent();
+
+	void Draw() override;
 
 private:
 	MeshData* meshData;

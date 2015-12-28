@@ -1,5 +1,6 @@
 #include "Transform.h"
 #include "Component.h"
+#include "Camera.h"
 
 const glm::vec3 Transform::GlobalForward = glm::vec3(0.0f, 0.0f, -1.0f);
 const glm::vec3 Transform::GlobalUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -242,6 +243,11 @@ glm::mat4x4 Transform::GetWorldMatrix()
 	this->dirtyFlags &= ~dirty_Matrix;
 
 	return this->worldMatrix;
+}
+
+glm::mat4 Transform::CalcMVPMatrix(Camera* camera)
+{
+	return camera->GetProjectionMatrix() * camera->GetViewMatrix() * this->GetWorldMatrix();
 }
 
 void Transform::_AddComponent(Component * component)

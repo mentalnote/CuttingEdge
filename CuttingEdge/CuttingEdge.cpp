@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <fstream>
+#include <iostream>
+
 #include "Time.h"
 #include "Input.h"
 
@@ -8,6 +10,7 @@
 #include "Scene.h"
 #include "FPSCamera.h"
 #include "MeshComponent.h"
+
 
 
 using namespace std;
@@ -47,11 +50,15 @@ Scene* CreateDefaultScene();
 int main(int argc, char *argv[])
 {
 	logfile.open("../log.txt");
+
+	std::streambuf* sbuf = std::cout.rdbuf();
+	std::cout.rdbuf(logfile.rdbuf());
+
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	SDL_Window* window = SDL_CreateWindow("OpenGL", 100, 100, 800, 600, SDL_WINDOW_OPENGL);
+	SDL_Window* window = SDL_CreateWindow("OpenGL", 100, 100, 1200, 800, SDL_WINDOW_OPENGL);
 	SDL_GLContext context = SDL_GL_CreateContext(window);
 
 	glewExperimental = GL_TRUE;
@@ -66,30 +73,16 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	// Create and compile the vertex shader
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexSource, NULL);
-	glCompileShader(vertexShader);
+	ShaderProgram* program = new ShaderProgram("simple");
 
-	// Create and compile the fragment shader
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-	glCompileShader(fragmentShader);
+	program->shaders.push_back(ResourceManager::LoadShader(vertPath));
+	program->shaders.push_back(ResourceManager::LoadShader(fragPath));
 
-	// Link the vertex and fragment shader into a shader program
-	GLuint shaderProgram = glCreateProgram();
+	ResourceManager::CompileShaderProgram(program);
 
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
+	Material* material = new Material(program);
 
-	glBindFragDataLocation(shaderProgram, 0, "outColor");
-
-	matrixID = glGetUniformLocation(shaderProgram, "MVP"); ;
-
-	glLinkProgram(shaderProgram);
-	glUseProgram(shaderProgram);
-
-	logfile << "ERROR: " << glGetError() << "\n";
+	cout << "ERROR: " << glGetError() << "\n";
 
 	Time time = Time();
 	Input input = Input(SDL_GetKeyboardState(nullptr));
@@ -110,13 +103,12 @@ int main(int argc, char *argv[])
 		}
 
 		time.Tick();
-
 		scene->Process();
 
 		glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		scene->Draw();
+		scene->Draw(material);
 
 		SDL_GL_SwapWindow(window);
 	}

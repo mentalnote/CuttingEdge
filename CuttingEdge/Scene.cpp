@@ -18,8 +18,31 @@ void Scene::Process()
 void Scene::Draw()
 {
 	for (Drawable* drawable : this->drawables) {
-		drawable->Draw(this->activeCamera);
+		Material* material = drawable->GetMaterial();
+		glm::mat4 mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera);
+
+		material->Bind();
+		material->SetUniform(Material::PropertyType::MAT4, "MVP", &mvp[0][0]);
+
+		drawable->Draw();
+		
+		material->Unbind();
 	}
+}
+
+void Scene::Draw(Material* material)
+{
+	material->Bind();
+
+	for (Drawable* drawable : this->drawables) {
+		glm::mat4 mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera);
+
+		material->SetUniform(Material::PropertyType::MAT4, "MVP", &mvp[0][0]);
+
+		drawable->Draw();
+	}
+
+	material->Unbind();
 }
 
 Camera * Scene::GetActiveCamera() const

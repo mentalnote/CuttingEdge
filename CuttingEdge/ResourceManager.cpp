@@ -131,6 +131,7 @@ bool ResourceManager::CompileShaderProgram(ShaderProgram* program)
 		glAttachShader(program->programId, shader->id);
 	}
 
+	glBindFragDataLocation(program->programId, 0, "outColor");
 	glLinkProgram(program->programId);
 
 	GLint isLinked = 0;
@@ -151,7 +152,7 @@ bool ResourceManager::CompileShaderProgram(ShaderProgram* program)
 		GLenum type;
 		glGetActiveUniform(program->programId, blockIx, nameLen, NULL, &size, &type, &name[0]);
 
-		program->propertyMap[std::string(&name[0])] = type;
+		program->propertyMap[std::string(&name[0])] = { blockIx, type };
 	}
 
 	shaderProgramMap[program->name] = program;

@@ -3,6 +3,7 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\quaternion.hpp>
 
+class Camera;
 class Component;
 class Scene;
 
@@ -106,6 +107,8 @@ public:
 
 	// Returns world matrix, first updating it if it's stored value is dirty
 	glm::mat4x4 GetWorldMatrix();
+
+	glm::mat4 CalcMVPMatrix(Camera* camera);
 
 	// Internal function wich adds a given component to the transform
 	void _AddComponent(Component* component);

@@ -1,6 +1,8 @@
 #pragma once
-#include "Texture.h"
+
 #include <unordered_map>
+#include "Texture.h"
+#include "ShaderProgram.h"
 
 class Shader;
 
@@ -33,7 +35,8 @@ public:
 		MAT4X2,
 		MAT2X4,
 		MAT3X4,
-		MAT4X3
+		MAT4X3,
+		SAMPLER2D
 	};
 
 	struct MaterialProperty
@@ -43,9 +46,22 @@ public:
 		void* value;
 	};
 
-	std::unordered_map<std::string, MaterialProperty>* materialProperties;
+	static GLuint boundProgram;
 
-	std::vector<Shader*> shaders;
+	std::unordered_map<std::string, MaterialProperty> materialProperties;
 
+	ShaderProgram* shader;
+	
 	Material();
+	Material(ShaderProgram* shader);
+
+	void Bind();
+	void Unbind();
+
+	void SetUniform(PropertyType type, std::string name, void* data);
+
+	void SetShader(ShaderProgram* shader);
+
+private:
+	void UpdateUniform(MaterialProperty matProp);
 };
