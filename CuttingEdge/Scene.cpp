@@ -2,11 +2,8 @@
 #include <iostream>
 #include "Time.h"
 
-Scene::Scene()
+Scene::Scene() : rootTransforms(), drawables(), processables()
 {
-	this->rootTransforms = std::vector<Transform*>();
-	this->drawables = std::unordered_set<Drawable*>();
-	this->processables = std::unordered_set<Processable*>();
 	this->activeCamera = nullptr;
 }
 

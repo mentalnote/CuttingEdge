@@ -30,6 +30,7 @@ Transform::Transform(Scene* scene, Transform* parent, std::string name)
 		this->parent->addChildRef(this);
 	}
 
+	this->scene = scene;
 	this->name = name;
 	this->localPosition = glm::vec3();
 	this->localRotation = glm::quat();
@@ -44,6 +45,7 @@ Transform::Transform(Scene* scene, glm::vec3 position, glm::quat rotation, glm::
 		this->parent->addChildRef(this);
 	}
 
+	this->scene = scene;
 	this->name = name;
 	this->localPosition = position;
 	this->localRotation = rotation;

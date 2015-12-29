@@ -2,7 +2,7 @@
 
 FPSCamera::FPSCamera(Transform* transform, Camera* camera, std::string name) : Component(transform, name)
 {
-	this->camera;
+	this->camera = camera;
 	this->processable = this;
 }
 

@@ -53,7 +53,7 @@ public:
 	ShaderProgram* shader;
 	
 	Material();
-	Material(ShaderProgram* shader);
+	explicit Material(ShaderProgram* shader);
 
 	void Bind();
 	void Unbind();

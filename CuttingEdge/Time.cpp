@@ -15,7 +15,7 @@ Time::Time()
 
 	instance = this;
 
-	currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	currentTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 }
 
 void Time::Tick()
@@ -25,8 +25,8 @@ void Time::Tick()
 		throw 1;
 	}
 
-	long long newTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	deltaTime = (newTime - currentTime) / 1000.0f;
+	long long newTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+	deltaTime = (newTime - currentTime) * 0.000001f;
 
 	currentTime = newTime;
 }
@@ -38,7 +38,7 @@ float Time::GetDeltaTime()
 
 float Time::Flag(std::string flag)
 {
-	long long cTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	long long cTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 
 	if(!flags.count(flag))
 	{
@@ -46,7 +46,7 @@ float Time::Flag(std::string flag)
 		return 0.0f;
 	}
 
-	float dTime = (cTime - flags[flag]) / 1000.0f;
+	float dTime = (cTime - flags[flag]) * 0.000001f;
 	flags[flag] = cTime;
 
 	return dTime;

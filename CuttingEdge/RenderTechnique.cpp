@@ -1,8 +1,8 @@
 #include "RenderTechnique.h"
 
-RenderTechnique::RenderTechnique()
+RenderTechnique::RenderTechnique() : layers()
 {
-	this->layers = std::vector<RenderLayer*>();
+//	this->layers = std::vector<RenderLayer*>();
 }
 
 void RenderTechnique::InitializeLayers()

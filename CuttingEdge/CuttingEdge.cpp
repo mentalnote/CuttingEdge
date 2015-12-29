@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 			input.SetInputEvent(nullptr);
 		}
 		
-		cout << Time::GetDeltaTime() << "\n";
+		cout << std::to_string(Time::GetDeltaTime()) << "\n";
 		time.Tick();
 		scene->Process();
 

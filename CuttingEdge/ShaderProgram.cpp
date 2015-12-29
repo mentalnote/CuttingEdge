@@ -4,12 +4,6 @@ const char* ShaderProgram::VERT_EXTENSION = "vert";
 const char* ShaderProgram::FRAG_EXTENSION = "frag";
 const char* ShaderProgram::GEOM_EXTENSION = "geom";
 
-ShaderProgram::ShaderProgram(std::string name)
+ShaderProgram::ShaderProgram(std::string name) : name(name), shaders(), programId(), propertyMap()
 {
-	this->name = name;
-	this->programId = 0;
-
-	this->shaders = std::vector<Shader*>();
-
-	this->propertyMap = std::unordered_map<std::string, std::pair<GLuint, GLuint>>();
 }

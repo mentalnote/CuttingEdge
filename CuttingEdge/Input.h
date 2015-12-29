@@ -10,7 +10,7 @@ private:
 	static Input* instance;
 
 public:
-	Input(const Uint8* keyboardState);
+	explicit Input(const Uint8* keyboardState);
 
 	static bool GetKeyDown(int key);
 

@@ -2,14 +2,12 @@
 
 GLuint Material::boundProgram = 0;
 
-Material::Material()
+Material::Material() : materialProperties(), shader()
 {
-	this->materialProperties = std::unordered_map<std::basic_string<char>, MaterialProperty>();
 }
 
-Material::Material(ShaderProgram* shader)
+Material::Material(ShaderProgram* shader) : materialProperties()
 {
-	Material();
 	this->shader = shader;
 }
 
