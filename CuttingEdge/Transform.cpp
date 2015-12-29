@@ -106,7 +106,7 @@ void Transform::SetLocalPosition(glm::vec3 position)
 
 glm::vec3 Transform::GetWorldPosition()
 {
-	if (!this->dirtyFlags & dirty_Position) {
+	if (!(this->dirtyFlags & dirty_Position)) {
 		return this->worldPosition;
 	}
 

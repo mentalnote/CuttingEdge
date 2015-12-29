@@ -134,7 +134,7 @@ Scene* CreateDefaultScene() {
 
 	Transform* stuffGroup = defaultScene->CreateTransform(nullptr, "Animals");
 
-	int cSize = 6;
+	int cSize = 8;
 
 	for (int i = 0; i < cSize; i++) {
 		for (int j = 0; j < cSize; j++) {

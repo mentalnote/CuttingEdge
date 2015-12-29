@@ -215,7 +215,7 @@ bool ResourceManager::CompileShader(ShaderProgram::Shader* shader)
 
 	if(storedShader == nullptr || storedShader->id)
 	{
-		return storedShader->id;
+		return false;
 	}
 
 	storedShader->id = glCreateShader(shader->type);
