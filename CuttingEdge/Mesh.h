@@ -39,7 +39,7 @@ public :
 	// Internal function only for setting reference to component which owns this object
 	void _SetComponent(Component* component) override;
 
-	Component* GetComponent();
+	Component* GetComponent() override;
 
 	void Draw() override;
 

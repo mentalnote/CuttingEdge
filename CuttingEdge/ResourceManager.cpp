@@ -92,13 +92,16 @@ bool ResourceManager::BufferMesh(Mesh::MeshData* meshData) {
 	glBufferData(GL_ARRAY_BUFFER, Vertex::SIZE * meshData->vertices.size(), (GLfloat*)meshData->vertices.data(), GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Vertex::SIZE, nullptr);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Vertex::SIZE, (void*)Vertex::POS_OFFSET);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Vertex::SIZE, (void*)(sizeof(GLfloat) * 3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Vertex::SIZE, (void*)Vertex::NORMAL_OFFSET);
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, Vertex::SIZE, (void*)(sizeof(GLfloat) * 6));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, Vertex::SIZE, (void*)Vertex::COLOR_OFFSET);
+	
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, Vertex::SIZE, (void*)Vertex::UV_OFFSET);
 
 	// Create an element array
 	glGenBuffers(1, &(meshData->ebo));
@@ -241,22 +244,22 @@ std::vector<Vertex> ResourceManager::CreateFlatVertexArray(aiMesh* mesh) {
 
 		aiVector3D pos = mesh->mVertices[i];
 
-		if(mesh->HasNormals() && mesh->HasVertexColors(0))
+		flatVertices[i].position = glm::vec3(pos.x, pos.y, pos.z);
+
+		if (mesh->HasNormals())
 		{
 			aiVector3D normal = mesh->mNormals[i];
-			aiColor4D* color = mesh->mColors[i];
-			flatVertices[i] = Vertex(glm::vec3(pos.x, pos.y, pos.z), glm::vec3(normal.x, normal.y, normal.z), glm::vec3(color->r, color->g, color->b));
-		} else if(mesh->HasNormals())
+			flatVertices[i].normal = glm::vec3(normal.x, normal.y, normal.z);
+		}
+		if (mesh->HasVertexColors(0))
 		{
-			aiVector3D normal = mesh->mNormals[i];
-			flatVertices[i] = Vertex(glm::vec3(pos.x, pos.y, pos.z), glm::vec3(normal.x, normal.y, normal.z));
-		} else if(mesh->HasVertexColors(0))
+			aiColor4D color = mesh->mColors[0][i];
+			flatVertices[i].color = glm::vec3(color.r, color.g, color.b);
+		}
+		if(mesh->HasTextureCoords(0))
 		{
-			aiColor4D* color = mesh->mColors[i];
-			flatVertices[i] = Vertex(glm::vec3(pos.x, pos.y, pos.z), glm::vec3(), glm::vec3(color->r, color->g, color->b));
-		} else
-		{
-			flatVertices[i] = Vertex(glm::vec3(pos.x, pos.y, pos.z));
+			auto texCoords = mesh->mTextureCoords[0][i];
+			flatVertices[i].uv = glm::vec2(texCoords.x, texCoords.y);
 		}
 	}
 
