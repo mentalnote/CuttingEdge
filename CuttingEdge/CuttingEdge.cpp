@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 
 	for (auto prop : testMat.shader->propertyMap)
 	{
-		logfile << prop.first << ": " << (int)prop.second.first << "\n";
+		logfile << prop.first << ": " << (int)prop.second.first << ", " << (int)prop.second.second << "\n";
 	}
 
 	double frameCount = 0;
@@ -125,12 +125,11 @@ int main(int argc, char *argv[])
 
 		scene->Draw();
 
-		glFinish();
-
 		SDL_GL_SwapWindow(window);
 	}
 
 	logfile << "Average frame latency: " << totalTime / frameCount << "\n";
+	logfile << "Average frame rate: " << frameCount / totalTime << "\n";
 
 	return Cleanup(context);
 }

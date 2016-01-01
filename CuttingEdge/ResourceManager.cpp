@@ -62,6 +62,8 @@ std::pair<Mesh::MeshData**, int> ResourceManager::LoadMeshData(std::string path)
 
 			meshes[i]->vertices = CreateFlatVertexArray(mesh);
 
+			meshes[i]->name = std::string(mesh->mName.C_Str());
+
 			meshes[i]->path = path;
 		}
 
@@ -241,7 +243,6 @@ std::vector<Vertex> ResourceManager::CreateFlatVertexArray(aiMesh* mesh) {
 	std::vector<Vertex> flatVertices = std::vector<Vertex>(mesh->mNumVertices);
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-
 		aiVector3D pos = mesh->mVertices[i];
 
 		flatVertices[i].position = glm::vec3(pos.x, pos.y, pos.z);

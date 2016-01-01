@@ -43,6 +43,9 @@
     <Filter Include="Source Files\Rendering">
       <UniqueIdentifier>{2b4b915e-bfe7-4f3e-ac61-d0eceed3d50a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Libs">
+      <UniqueIdentifier>{adf2a8b5-7ce3-49c4-a832-55a572f31865}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="guicon.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ThirdParty\stb\stb_image.h">
+      <Filter>Header Files\Libs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
