@@ -39,6 +39,8 @@ public:
 
 	glm::mat4 GetViewMatrix();
 
+	glm::mat4 GetViewProjectionMatrix();
+
 	Transform* GetTransform();
 
 	ProjectionMode GetProjectionMode() const;

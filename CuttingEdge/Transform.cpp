@@ -249,7 +249,7 @@ glm::mat4x4 Transform::GetWorldMatrix()
 
 glm::mat4 Transform::CalcMVPMatrix(Camera* camera)
 {
-	return camera->GetProjectionMatrix() * camera->GetViewMatrix() * this->GetWorldMatrix();
+	return camera->GetViewProjectionMatrix() * this->GetWorldMatrix();
 }
 
 void Transform::_AddComponent(Component * component)

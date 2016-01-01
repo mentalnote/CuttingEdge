@@ -1,4 +1,5 @@
 #include "Material.h"
+#include <iostream>
 
 GLuint Material::boundProgram = 0;
 

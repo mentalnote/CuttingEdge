@@ -39,7 +39,7 @@ const string vertPath = "../Resources/Shaders/simple.vert";
 const string fragPath = "../Resources/Shaders/simple.frag";
 const string SIMPLE_SHADER = "simple";
 
-//ofstream logfile;
+ofstream logfile;
 
 Scene* scene;
 
@@ -49,7 +49,7 @@ Scene* CreateDefaultScene();
 
 int main(int argc, char *argv[])
 {
-	//logfile.open("../log.txt");
+	logfile.open("../log.txt");
 
 	RedirectIOToConsole();
 
@@ -84,7 +84,17 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	cout << "ERROR: " << glGetError() << "\n";
+	logfile << "ERROR: " << glGetError() << "\n";
+
+	Material testMat = Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER));
+
+	for (auto prop : testMat.shader->propertyMap)
+	{
+		logfile << prop.first << ": " << (int)prop.second.first << "\n";
+	}
+
+	double frameCount = 0;
+	double totalTime = 0;
 
 	Time time = Time();
 	Input input = Input(SDL_GetKeyboardState(nullptr));
@@ -104,7 +114,9 @@ int main(int argc, char *argv[])
 			input.SetInputEvent(nullptr);
 		}
 		
-		cout << std::to_string(Time::GetDeltaTime()) << "\n";
+		cout << to_string(Time::GetDeltaTime()) << "\n";
+		frameCount++;
+		totalTime += Time::GetDeltaTime();
 		time.Tick();
 		scene->Process();
 
@@ -117,6 +129,8 @@ int main(int argc, char *argv[])
 
 		SDL_GL_SwapWindow(window);
 	}
+
+	logfile << "Average frame latency: " << totalTime / frameCount << "\n";
 
 	return Cleanup(context);
 }

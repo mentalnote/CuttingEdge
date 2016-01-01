@@ -25,7 +25,7 @@ void Scene::Draw()
 
 		drawable->Draw();
 		
-		material->Unbind();
+		//material->Unbind();
 	}
 }
 

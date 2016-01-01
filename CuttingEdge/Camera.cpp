@@ -51,6 +51,11 @@ glm::mat4 Camera::GetViewMatrix()
 	return glm::inverse(this->transform->GetWorldMatrix());
 }
 
+glm::mat4 Camera::GetViewProjectionMatrix()
+{
+	return this->GetProjectionMatrix() * this->GetViewMatrix();
+}
+
 Transform * Camera::GetTransform()
 {
 	return this->transform;
