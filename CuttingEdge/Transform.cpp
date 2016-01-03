@@ -236,15 +236,45 @@ glm::mat4x4 Transform::GetWorldMatrix()
 		return this->worldMatrix;
 	}
 
-	glm::mat4 translate = glm::translate(glm::mat4(1.0f), this->GetWorldPosition());
-	glm::mat4 rotate = glm::mat4_cast(this->GetWorldRotation());
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), this->GetWorldScale());
-	
-	this->worldMatrix = translate * rotate * scale;
+	this->CalcWorldMatrix();
 
 	this->dirtyFlags &= ~dirty_Matrix;
 
 	return this->worldMatrix;
+}
+
+glm::mat4x4 Transform::GetInverseWorldMatrix()
+{
+	if (this->dirtyFlags & dirty_Matrix) {
+		this->CalcWorldMatrix();
+		this->dirtyFlags &= ~dirty_Matrix;
+	}
+
+	if(this->cacheInverseMatrix)
+	{
+		return this->inverseWorldMatrix;
+	}
+
+	return glm::inverse(this->worldMatrix);
+}
+
+void Transform::SetCacheInverseMatrix(bool doCache)
+{
+	this->cacheInverseMatrix = doCache;
+}
+
+void Transform::CalcWorldMatrix()
+{
+	glm::mat4 translate = glm::translate(glm::mat4(1.0f), this->GetWorldPosition());
+	glm::mat4 rotate = glm::mat4_cast(this->GetWorldRotation());
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), this->GetWorldScale());
+
+	this->worldMatrix = translate * rotate * scale;
+
+	if(this->cacheInverseMatrix)
+	{
+		this->inverseWorldMatrix = glm::inverse(this->worldMatrix);
+	}
 }
 
 glm::mat4 Transform::CalcMVPMatrix(Camera* camera)

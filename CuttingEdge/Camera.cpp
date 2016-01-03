@@ -15,6 +15,7 @@ Camera::Camera(ProjectionMode projectionMode, Transform* transform, int width, i
 	this->projectionMode = projectionMode;
 
 	this->transform = transform;
+	this->transform->SetCacheInverseMatrix(true);
 
 	this->left = 0.0f;
 	this->right = width;
@@ -48,7 +49,7 @@ glm::mat4 Camera::GetProjectionMatrix()
 
 glm::mat4 Camera::GetViewMatrix()
 {
-	return glm::inverse(this->transform->GetWorldMatrix());
+	return this->transform->GetInverseWorldMatrix();
 }
 
 glm::mat4 Camera::GetViewProjectionMatrix()

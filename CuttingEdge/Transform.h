@@ -28,6 +28,8 @@ private:
 	std::vector<Component*> components;
 
 	glm::mat4x4 worldMatrix;
+	glm::mat4x4 inverseWorldMatrix;
+	bool cacheInverseMatrix;
 
 	glm::vec3 localPosition;
 	glm::vec3 worldPosition;
@@ -108,6 +110,10 @@ public:
 	// Returns world matrix, first updating it if it's stored value is dirty
 	glm::mat4x4 GetWorldMatrix();
 
+	glm::mat4x4 GetInverseWorldMatrix();
+
+	void SetCacheInverseMatrix(bool doCache);
+
 	glm::mat4 CalcMVPMatrix(Camera* camera);
 
 	// Internal function wich adds a given component to the transform
@@ -133,4 +139,6 @@ private:
 	void removeChildRef(Transform* child);
 
 	void addChildRef(Transform* child);
+
+	void CalcWorldMatrix();
 };
