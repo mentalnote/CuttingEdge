@@ -64,6 +64,8 @@ int main(int argc, char *argv[])
 
 	glewInit();
 
+	SDL_GL_SetSwapInterval(0);
+
 	glFrontFace(GL_CW);
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
@@ -88,9 +90,10 @@ int main(int argc, char *argv[])
 
 	Material testMat = Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER));
 
-	for (auto prop : testMat.shader->propertyMap)
+	for (int i = 0; i < testMat.shader->properties.size(); i++)
 	{
-		logfile << prop.first << ": " << (int)prop.second.first << ", " << (int)prop.second.second << "\n";
+		auto prop = testMat.shader->properties[i];
+		logfile << prop.first << ": " << i << ", " << (int)prop.second << "\n";
 	}
 
 	double frameCount = 0;
@@ -202,7 +205,7 @@ Scene* CreateDefaultScene() {
 
 int Cleanup(SDL_GLContext context) {
 	delete scene;
-	//logfile.close();
+	logfile.close();
 	SDL_GL_DeleteContext(context);
 	SDL_Quit();
 	return 0;

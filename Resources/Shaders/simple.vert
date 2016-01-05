@@ -1,4 +1,13 @@
 #version 150 core
+uniform vec4 a;
+uniform vec4 b;
+uniform vec4 c;
+uniform vec4 d;
+uniform vec4 e;
+uniform vec4 f;
+uniform vec4 g;
+uniform vec4 h;
+uniform vec4 i;
 uniform mat4 MVP;
 uniform sampler2D someTex;
 in vec3 position;

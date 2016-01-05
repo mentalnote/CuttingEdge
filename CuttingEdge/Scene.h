@@ -15,6 +15,8 @@ private:
 	std::unordered_set<Processable*> processables;
 	Camera* activeCamera;
 
+	glm::mat4 mvp;
+
 public:
 	Scene();
 

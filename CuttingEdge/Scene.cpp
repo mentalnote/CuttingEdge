@@ -18,13 +18,16 @@ void Scene::Draw()
 {
 	for (Drawable* drawable : this->drawables) {
 		Material* material = drawable->GetMaterial();
-		glm::mat4 mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera);
-
+		mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera);
+//
 		material->Bind();
 		material->SetMatrix4("MVP", &mvp);
 		material->UpdateAllUniforms();
-
+//		this->activeCamera->GetProjectionMatrix() * this->activeCamera->GetViewMatrix() * drawable->GetComponent()->GetTransform()->GetWorldMatrix();
+//		glUniformMatrix4fv(0, 1, GL_FALSE, &(this->activeCamera->GetProjectionMatrix() * this->activeCamera->GetViewMatrix() * drawable->GetComponent()->GetTransform()->GetWorldMatrix())[0][0]);
+//		glUniformMatrix4fv(0, 1, GL_FALSE, &drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera)[0][0]);
 //		glUniformMatrix4fv(material->shader->propertyMap["MVP"].first, 1, GL_FALSE, &mvp[0][0]);
+//		glUniformMatrix4fv(0, 1, GL_FALSE, &mvp[0][0]);
 
 		drawable->Draw();
 		
@@ -40,7 +43,7 @@ void Scene::Draw(Material* material)
 
 		glm::mat4 mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera);
 		material->SetMatrix4("MVP", &mvp);
-		material->UpdateUniform("MVP");
+		material->UpdateAllUniforms();
 
 		drawable->Draw();
 	}

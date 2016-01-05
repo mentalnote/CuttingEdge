@@ -13,10 +13,10 @@ public:
 
 	static GLuint boundProgram;
 
-	std::unordered_map<std::string, GLfloat> floatProperties;
-	std::unordered_map<std::string, glm::vec4*> vec4Properties;
-	std::unordered_map<std::string, glm::mat4*> matrix4Properties;
-	std::unordered_map<std::string, Texture*> textureProperties;
+	std::unordered_map<std::string, GLint> propertyMap;
+
+	std::vector<std::string> propTest;
+	std::vector<void*> propertyData;
 
 	ShaderProgram* shader;
 	
@@ -33,6 +33,5 @@ public:
 
 	void SetShader(ShaderProgram* shader);
 
-	void UpdateUniform(std::string name);
 	void UpdateAllUniforms();
 };

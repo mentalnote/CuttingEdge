@@ -7,9 +7,16 @@ Material::Material() : shader()
 {
 }
 
-Material::Material(ShaderProgram* shader)
+Material::Material(ShaderProgram* shader) : propTest(shader->properties.size()), propertyData(shader->properties.size())
 {
 	this->shader = shader;
+
+	for (int i = 0; i < shader->properties.size(); i++)
+	{
+		this->propertyMap[shader->properties[i].first] = i;
+
+		this->propTest[i] = shader->properties[i].first;
+	}
 }
 
 void Material::Bind()
@@ -25,66 +32,54 @@ void Material::Bind()
 
 void Material::SetFloat(std::string name, GLfloat data)
 {
-	this->floatProperties[name] = data;
+	this->propertyData[this->propertyMap[name]] = &data;
 }
 
 void Material::SetVector4(std::string name, glm::vec4* data)
 {
-	this->vec4Properties[name] = data;
+	this->propertyData[this->propertyMap[name]] = &data;
 }
 
 void Material::SetMatrix4(std::string name, glm::mat4* data)
 {
-	this->matrix4Properties[name] = data;
+	for (int i = 0; i < propTest.size(); i++)
+	{
+		if(propTest[i] == name)
+		{
+			this->propertyData[i] = &data[0][0];
+			return;
+		}
+	}
+	
+	//this->propertyData[this->propertyMap[name]] = &data[0][0];
 }
 
 void Material::SetTexture(std::string name, Texture* data)
 {
-	this->textureProperties[name] = data;
-}
-
-void Material::UpdateUniform(std::string name)
-{
-	auto uniform = this->shader->propertyMap.at(name);
-	if(uniform.second == GL_FLOAT_MAT4)
-	{
-		glUniformMatrix4fv(uniform.first, 1, GL_FALSE, (GLfloat*)this->matrix4Properties[name]);
-	} else if (uniform.second == GL_FLOAT_VEC4)
-	{
-		glm::vec4 data = *this->vec4Properties[name];
-		glUniform4f(uniform.first, data[0], data[1], data[2], data[3]);
-	} else if(uniform.second == GL_FLOAT)
-	{
-		glUniform1f(uniform.first, this->floatProperties[name]);
-	} else if(uniform.second == GL_SAMPLER_2D)
-	{
-		
-	}
+	this->propertyData[this->propertyMap[name]] = &data;
 }
 
 void Material::UpdateAllUniforms()
 {
-	for(auto prop : this->shader->propertyMap)
+	for (int i = 0; i < this->shader->properties.size(); i++)
 	{
-		if (prop.second.second == GL_FLOAT_MAT4)
+		GLuint propType = this->shader->properties[i].second;
+
+		switch (propType) {
+		case GL_FLOAT_MAT4:
+			glUniformMatrix4fv(i, 1, GL_FALSE, (GLfloat*)this->propertyData[i]);
+			break;
+		case GL_FLOAT_VEC4:
 		{
-			glUniformMatrix4fv(prop.second.first, 1, GL_FALSE, (GLfloat*)this->matrix4Properties.at(prop.first));
+			glm::vec4 data = *(glm::vec4*)this->propertyData[i];
+			glUniform4f(i, data[0], data[1], data[2], data[3]);
+			break;
 		}
-		else if (prop.second.second == GL_FLOAT_VEC4)
-		{
-			glm::vec4 data = *this->vec4Properties[prop.first];
-			glUniform4f(prop.second.first, data[0], data[1], data[2], data[3]);
-		}
-		else if (prop.second.second == GL_FLOAT)
-		{
-			glUniform1f(prop.second.first, this->floatProperties[prop.first]);
-		}
-		else if (prop.second.second == GL_SAMPLER_2D)
-		{
-//			Texture* texture = this->textureProperties.at(prop.first);
-//			glActiveTexture(prop.second.first);
-//			texture->Bind();
-//			glUniform1i()
+		case GL_FLOAT:
+			glUniform1f(i, *(GLint*)this->propertyData[i]);
+			break;
+		case GL_SAMPLER_2D:
+			break;
 		}
 	}
 }
@@ -102,8 +97,15 @@ void Material::SetShader(ShaderProgram* shader)
 {
 	this->shader = shader;
 
-	for(auto prop : this->shader->propertyMap)
+	this->propertyData.clear();
+	this->propertyMap.clear();
+
+	this->propertyData.resize(shader->properties.size());
+
+	for (int i = 0; i < shader->properties.size(); i++)
 	{
-		this->UpdateUniform(prop.first);
+		this->propertyMap[shader->properties[i].first] = i;
 	}
+
+	this->UpdateAllUniforms();
 }

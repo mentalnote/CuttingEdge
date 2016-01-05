@@ -151,13 +151,15 @@ bool ResourceManager::CompileShaderProgram(ShaderProgram* program)
 	std::vector<GLchar> name;
 	name.resize(nameLen);
 
+	program->properties.resize(numBlocks);
+
 	for (int blockIx = 0; blockIx < numBlocks; ++blockIx)
 	{
 		GLint size;
 		GLenum type;
 		glGetActiveUniform(program->programId, blockIx, nameLen, NULL, &size, &type, &name[0]);
 
-		program->propertyMap[std::string(&name[0])] = { blockIx, type };
+		program->properties[blockIx] = { std::string(&name[0]), type };
 	}
 
 	shaderProgramMap[program->name] = program;
