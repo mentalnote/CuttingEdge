@@ -16,12 +16,15 @@ void Scene::Process()
 
 void Scene::Draw()
 {
+	glm::mat4 viewProj = this->activeCamera->GetViewProjectionMatrix();
+	std::string mvp_string = "MVP";
+
 	for (Drawable* drawable : this->drawables) {
 		Material* material = drawable->GetMaterial();
-		mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera);
-//
+		mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(&viewProj);
+
 		material->Bind();
-		material->SetMatrix4("MVP", &mvp);
+		material->SetMatrix4(&mvp_string, &mvp);
 		material->UpdateAllUniforms();
 //		this->activeCamera->GetProjectionMatrix() * this->activeCamera->GetViewMatrix() * drawable->GetComponent()->GetTransform()->GetWorldMatrix();
 //		glUniformMatrix4fv(0, 1, GL_FALSE, &(this->activeCamera->GetProjectionMatrix() * this->activeCamera->GetViewMatrix() * drawable->GetComponent()->GetTransform()->GetWorldMatrix())[0][0]);
@@ -37,12 +40,14 @@ void Scene::Draw()
 
 void Scene::Draw(Material* material)
 {
+	glm::mat4 viewProj = this->activeCamera->GetViewProjectionMatrix();
+	std::string mvp_string = "MVP";
 	material->Bind();
 
 	for (Drawable* drawable : this->drawables) {
 
-		glm::mat4 mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(this->activeCamera);
-		material->SetMatrix4("MVP", &mvp);
+		glm::mat4 mvp = drawable->GetComponent()->GetTransform()->CalcMVPMatrix(&viewProj);
+		material->SetMatrix4(&mvp_string, &mvp);
 		material->UpdateAllUniforms();
 
 		drawable->Draw();

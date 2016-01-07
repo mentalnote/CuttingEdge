@@ -28,7 +28,7 @@ public:
 
 	void SetFloat(std::string name, GLfloat data);
 	void SetVector4(std::string name, glm::vec4* data);
-	void SetMatrix4(std::string name, glm::mat4* data);
+	void SetMatrix4(std::string* name, glm::mat4* data);
 	void SetTexture(std::string name, Texture* data);
 
 	void SetShader(ShaderProgram* shader);

@@ -277,9 +277,9 @@ void Transform::CalcWorldMatrix()
 	}
 }
 
-glm::mat4 Transform::CalcMVPMatrix(Camera* camera)
+glm::mat4 Transform::CalcMVPMatrix(glm::mat4* viewProj)
 {
-	return camera->GetViewProjectionMatrix() * this->GetWorldMatrix();
+	return *viewProj * this->GetWorldMatrix();
 }
 
 void Transform::_AddComponent(Component * component)

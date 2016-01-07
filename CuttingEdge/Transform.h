@@ -114,7 +114,7 @@ public:
 
 	void SetCacheInverseMatrix(bool doCache);
 
-	glm::mat4 CalcMVPMatrix(Camera* camera);
+	glm::mat4 CalcMVPMatrix(glm::mat4* viewProj);
 
 	// Internal function wich adds a given component to the transform
 	void _AddComponent(Component* component);

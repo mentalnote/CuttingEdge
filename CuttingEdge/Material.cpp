@@ -40,11 +40,11 @@ void Material::SetVector4(std::string name, glm::vec4* data)
 	this->propertyData[this->propertyMap[name]] = &data;
 }
 
-void Material::SetMatrix4(std::string name, glm::mat4* data)
+void Material::SetMatrix4(std::string* name, glm::mat4* data)
 {
 	for (int i = 0; i < propTest.size(); i++)
 	{
-		if(propTest[i] == name)
+		if(propTest[i] == *name)
 		{
 			this->propertyData[i] = &data[0][0];
 			return;
