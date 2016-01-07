@@ -33,8 +33,6 @@ void Scene::Draw()
 //		glUniformMatrix4fv(0, 1, GL_FALSE, &mvp[0][0]);
 
 		drawable->Draw();
-		
-		//material->Unbind();
 	}
 }
 

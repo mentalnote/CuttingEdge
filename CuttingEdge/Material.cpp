@@ -11,7 +11,7 @@ Material::Material(ShaderProgram* shader) : propTest(shader->properties.size()),
 {
 	this->shader = shader;
 
-	for (int i = 0; i < shader->properties.size(); i++)
+	for (unsigned int i = 0; i < shader->properties.size(); i++)
 	{
 		this->propertyMap[shader->properties[i].first] = i;
 
@@ -42,7 +42,7 @@ void Material::SetVector4(std::string name, glm::vec4* data)
 
 void Material::SetMatrix4(std::string* name, glm::mat4* data)
 {
-	for (int i = 0; i < propTest.size(); i++)
+	for (unsigned int i = 0; i < propTest.size(); i++)
 	{
 		if(propTest[i] == *name)
 		{
@@ -61,11 +61,11 @@ void Material::SetTexture(std::string name, Texture* data)
 
 void Material::UpdateAllUniforms()
 {
-	for (int i = 0; i < this->shader->properties.size(); i++)
+	for (unsigned int i = 0; i < this->shader->properties.size(); i++)
 	{
-		GLuint propType = this->shader->properties[i].second;
+		auto propType = &this->shader->properties[i];
 
-		switch (propType) {
+		switch (propType->second) {
 		case GL_FLOAT_MAT4:
 			glUniformMatrix4fv(i, 1, GL_FALSE, (GLfloat*)this->propertyData[i]);
 			break;
@@ -76,7 +76,7 @@ void Material::UpdateAllUniforms()
 			break;
 		}
 		case GL_FLOAT:
-			glUniform1f(i, *(GLint*)this->propertyData[i]);
+			glUniform1f(i, *(GLfloat*)this->propertyData[i]);
 			break;
 		case GL_SAMPLER_2D:
 			break;
@@ -102,7 +102,7 @@ void Material::SetShader(ShaderProgram* shader)
 
 	this->propertyData.resize(shader->properties.size());
 
-	for (int i = 0; i < shader->properties.size(); i++)
+	for (unsigned int i = 0; i < shader->properties.size(); i++)
 	{
 		this->propertyMap[shader->properties[i].first] = i;
 	}
