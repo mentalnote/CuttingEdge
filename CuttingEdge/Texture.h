@@ -4,7 +4,17 @@
 class Texture
 {
 public:
-	GLuint textureId;
+	struct TextureData {
+		std::string path;
+		std::string name;
+		GLint width;
+		GLint height;
+		GLint components;
+		GLuint index;
+		unsigned char* data;
+	};
 
-	void Bind();
+	TextureData* data;
+
+	explicit Texture(TextureData* data);
 };

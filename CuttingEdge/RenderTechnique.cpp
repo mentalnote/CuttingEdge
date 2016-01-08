@@ -9,13 +9,13 @@ void RenderTechnique::InitializeLayers()
 {
 	this->initializedBuffers = std::unordered_map<std::string, RenderLayer::TexBuffer*>();
 
-	for (int i = 0; i < this->layers.size(); i++)
+	for (unsigned int i = 0; i < this->layers.size(); i++)
 	{
 		std::vector<RenderLayer::TexBuffer*> inputReqs = this->layers[i]->GetRequiredInputs();
 
 		std::vector<RenderLayer::TexBuffer*> inputs = std::vector<RenderLayer::TexBuffer*>();
 
-		for (int j = 0; j < inputReqs.size(); j++)
+		for (unsigned int j = 0; j < inputReqs.size(); j++)
 		{
 			 RenderLayer::TexBuffer* reqBuffer = this->initializedBuffers.at(inputReqs[j]->name);
 
@@ -26,7 +26,7 @@ void RenderTechnique::InitializeLayers()
 
 		std::vector<RenderLayer::TexBuffer*> outputs = this->layers[i]->GetOutputBuffers();
 
-		for (int j = 0; j < outputs.size(); j++)
+		for (unsigned int j = 0; j < outputs.size(); j++)
 		{
 			this->initializedBuffers[outputs[j]->name] = outputs[j];
 		}
@@ -35,7 +35,7 @@ void RenderTechnique::InitializeLayers()
 
 void RenderTechnique::Render(Scene* scene)
 {
-	for (int i = 0; i < this->layers.size(); i++)
+	for (unsigned int i = 0; i < this->layers.size(); i++)
 	{
 		this->layers[i]->Render(scene);
 	}

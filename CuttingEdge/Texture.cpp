@@ -1,5 +1,6 @@
 #include "Texture.h"
 
-void Texture::Bind()
+Texture::Texture(TextureData* data)
 {
+	this->data = data;
 }

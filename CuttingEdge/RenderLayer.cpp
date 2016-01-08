@@ -12,7 +12,7 @@ void RenderLayer::Initialize(std::vector<TexBuffer*> inputBuffers)
 	glGenFramebuffers(1, &this->frameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->frameBuffer);
 
-	for (int i = 0; i < this->outputBuffers.size(); i++)
+	for (unsigned int i = 0; i < this->outputBuffers.size(); i++)
 	{
 		TexBuffer* buffer = this->outputBuffers[i];
 

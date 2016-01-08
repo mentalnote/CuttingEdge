@@ -9,6 +9,7 @@
 #include <assimp/postprocess.h>
 #include "Texture.h"
 #include "ShaderProgram.h"
+#include "stb_image_header.h"
 
 class ResourceManager {
 public:
@@ -31,6 +32,8 @@ public:
 
 	static Texture* LoadTexture(std::string path);
 
+	static bool BufferTexture(Texture::TextureData* texData);
+
 	static bool CompileShader(ShaderProgram::Shader* shader);
 
 	static bool CompileShaderProgram(ShaderProgram* shader);
@@ -47,7 +50,7 @@ private:
 	// unordered_map which stores data necessary to buffer and draw meshes
 	static std::unordered_map<std::string, std::pair<Mesh::MeshData**, int>> meshMap;
 
-	static std::unordered_map<std::string, Texture*> textureMap;
+	static std::unordered_map<std::string, Texture::TextureData*> textureMap;
 
 	static std::unordered_map<std::string, ShaderProgram::Shader*> shaderMap;
 

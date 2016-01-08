@@ -5,7 +5,7 @@ Assimp::Importer* ResourceManager::importer = new Assimp::Importer();
 
 std::unordered_map<std::string, std::pair<Mesh::MeshData**, int>> ResourceManager::meshMap = std::unordered_map<std::string, std::pair<Mesh::MeshData**, int>>();
 
-std::unordered_map<std::string, Texture*> ResourceManager::textureMap = std::unordered_map<std::string, Texture*>();
+std::unordered_map<std::string, Texture::TextureData*> ResourceManager::textureMap = std::unordered_map<std::string, Texture::TextureData*>();
 
 std::unordered_map<std::string, ShaderProgram::Shader*> ResourceManager::shaderMap = std::unordered_map<std::string, ShaderProgram::Shader*>();
 
@@ -164,7 +164,7 @@ bool ResourceManager::CompileShaderProgram(ShaderProgram* program)
 
 	shaderProgramMap[program->name] = program;
 
-	return isLinked;
+	return isLinked > 0;
 }
 
 ShaderProgram* ResourceManager::GetShaderProgram(std::string name)
@@ -174,7 +174,58 @@ ShaderProgram* ResourceManager::GetShaderProgram(std::string name)
 
 Texture* ResourceManager::LoadTexture(std::string path)
 {
-	return new Texture();
+	Texture::TextureData* texData = textureMap[path];
+
+	if(texData == nullptr)
+	{
+		texData = new Texture::TextureData();
+		texData->data = stbi_load(path.c_str(), &texData->width, &texData->height, &texData->components, 0);
+
+		if(texData->data == nullptr)
+		{
+			return nullptr;
+		}
+
+		texData->path = path;
+
+		std::string name = path;
+		
+		int sIndex = path.find_last_of('/');
+		int eIndex = path.find_last_of('.');
+
+		texData->name = path.substr(sIndex, eIndex - sIndex);
+
+		textureMap[path] = texData;
+	}
+
+	return new Texture(texData);
+}
+
+bool ResourceManager::BufferTexture(Texture::TextureData* texData)
+{
+	if(texData->index != 0)
+	{
+		return false;
+	}
+
+	glGenTextures(1, &texData->index);
+
+	glBindTexture(GL_TEXTURE_2D, texData->index);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	if (texData->components == 3) 
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texData->width, texData->width, 0, GL_RGB, GL_UNSIGNED_BYTE, texData->data);
+	} else if (texData->components == 4)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texData->width, texData->width, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData->data);
+	}	
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return true;
 }
 
 ShaderProgram::Shader* ResourceManager::LoadShaderSource(std::string path)

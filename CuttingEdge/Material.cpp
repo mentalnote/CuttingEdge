@@ -56,29 +56,41 @@ void Material::SetMatrix4(std::string* name, glm::mat4* data)
 
 void Material::SetTexture(std::string name, Texture* data)
 {
-	this->propertyData[this->propertyMap[name]] = &data;
+	this->propertyData[this->propertyMap[name]] = &data->data->index;
 }
 
 void Material::UpdateAllUniforms()
 {
+	unsigned int samplerCount = 0;
+
 	for (unsigned int i = 0; i < this->shader->properties.size(); i++)
 	{
 		auto propType = &this->shader->properties[i];
+		void* pData = this->propertyData[i];
+
+		if(pData == nullptr)
+		{
+			continue;
+		}
 
 		switch (propType->second) {
 		case GL_FLOAT_MAT4:
-			glUniformMatrix4fv(i, 1, GL_FALSE, (GLfloat*)this->propertyData[i]);
+			glUniformMatrix4fv(i, 1, GL_FALSE, (GLfloat*)pData);
 			break;
 		case GL_FLOAT_VEC4:
 		{
-			glm::vec4 data = *(glm::vec4*)this->propertyData[i];
+			glm::vec4 data = *(glm::vec4*)pData;
 			glUniform4f(i, data[0], data[1], data[2], data[3]);
 			break;
 		}
 		case GL_FLOAT:
-			glUniform1f(i, *(GLfloat*)this->propertyData[i]);
+			glUniform1f(i, *(GLfloat*)pData);
 			break;
 		case GL_SAMPLER_2D:
+			glActiveTexture(samplerCount);
+			glBindTexture(GL_TEXTURE_2D, *(GLuint*)pData);
+			glUniform1i(i, samplerCount);
+			++samplerCount;
 			break;
 		}
 	}

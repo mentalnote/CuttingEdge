@@ -10,6 +10,7 @@
 #include "Scene.h"
 #include "FPSCamera.h"
 #include "MeshComponent.h"
+#include "Texture.h"
 #include "guicon.h"
 
 using namespace std;
@@ -34,10 +35,13 @@ const GLchar* fragmentSource =
 "}";
 
 const string bearPath = "../Resources/Models/bear.obj";
+const string bearTexPath = "../Resources/Textures/bear.png";
 const string deerPath = "../Resources/Models/deer.obj";
+const string deerTexPath = "../Resources/Textures/deer.png";
 const string vertPath = "../Resources/Shaders/simple.vert";
 const string fragPath = "../Resources/Shaders/simple.frag";
 const string SIMPLE_SHADER = "simple";
+const string MAIN_TEX = "mainTex";
 
 ofstream logfile;
 
@@ -90,7 +94,7 @@ int main(int argc, char *argv[])
 
 	Material testMat = Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER));
 
-	for (int i = 0; i < testMat.shader->properties.size(); i++)
+	for (unsigned int i = 0; i < testMat.shader->properties.size(); i++)
 	{
 		auto prop = testMat.shader->properties[i];
 		logfile << prop.first << ": " << i << ", " << (int)prop.second << "\n";
@@ -140,6 +144,12 @@ int main(int argc, char *argv[])
 Scene* CreateDefaultScene() {
 	Scene* defaultScene = new Scene();
 
+	Texture* bearTex = ResourceManager::LoadTexture(bearTexPath);
+	ResourceManager::BufferTexture(bearTex->data);
+
+	Texture* deerTex = ResourceManager::LoadTexture(deerTexPath);
+	ResourceManager::BufferTexture(deerTex->data);
+
 	Transform* cTransform = defaultScene->CreateTransform(nullptr, "Cam Node");
 	cTransform->SetLocalRotation(glm::quat(0.0f, glm::vec3(0.0f, 1.0f, 0.0f)));
 	cTransform->SetLocalPosition(glm::vec3(0.0f, 0.0f, -10.0f));
@@ -168,6 +178,7 @@ Scene* CreateDefaultScene() {
 						for (int l = 0; l < mComponent.second; l++) {
 							MeshComponent* meshComponent = new MeshComponent(bear, mComponent.first[l], name);
 							meshComponent->SetMaterial(new Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER)));
+							meshComponent->GetMaterial()->SetTexture(MAIN_TEX, bearTex);
 							defaultScene->AddComponent(meshComponent);
 						}
 					} else
@@ -188,6 +199,7 @@ Scene* CreateDefaultScene() {
 						for (int l = 0; l < mComponent.second; l++) {
 							MeshComponent* meshComponent = new MeshComponent(deer, mComponent.first[l], name);
 							meshComponent->SetMaterial(new Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER)));
+							meshComponent->GetMaterial()->SetTexture(MAIN_TEX, deerTex);
 							defaultScene->AddComponent(meshComponent);
 						}
 					}
