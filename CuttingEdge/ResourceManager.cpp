@@ -217,11 +217,13 @@ bool ResourceManager::BufferTexture(Texture::TextureData* texData)
 
 	if (texData->components == 3) 
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texData->width, texData->width, 0, GL_RGB, GL_UNSIGNED_BYTE, texData->data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texData->width, texData->height, 0, GL_RGB, GL_UNSIGNED_BYTE, texData->data);
 	} else if (texData->components == 4)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texData->width, texData->width, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData->data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texData->width, texData->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData->data);
 	}	
+
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
