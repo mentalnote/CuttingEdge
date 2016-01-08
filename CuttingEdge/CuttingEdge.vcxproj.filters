@@ -105,6 +105,9 @@
     <ClCompile Include="stb_image_impl.cpp">
       <Filter>Header Files\Libs</Filter>
     </ClCompile>
+    <ClCompile Include="Primitives.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -172,6 +175,9 @@
     </ClInclude>
     <ClInclude Include="stb_image_header.h">
       <Filter>Header Files\Libs</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

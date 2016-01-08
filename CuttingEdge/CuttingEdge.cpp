@@ -12,6 +12,7 @@
 #include "MeshComponent.h"
 #include "Texture.h"
 #include "guicon.h"
+#include "Primitives.h"
 
 using namespace std;
 
@@ -71,8 +72,8 @@ int main(int argc, char *argv[])
 	SDL_GL_SetSwapInterval(0);
 
 	glFrontFace(GL_CW);
-	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
 	ShaderProgram* program = new ShaderProgram(SIMPLE_SHADER);
@@ -162,14 +163,27 @@ Scene* CreateDefaultScene() {
 
 	int cSize = 8;
 
+//	Mesh* quad = Primitives::CreateQuad();
+//
+//	Transform* quadTransform = defaultScene->CreateTransform(stuffGroup, "quad transform");
+//	quadTransform->SetLocalPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+//	quadTransform->SetLocalRotation(glm::quat(glm::vec3(glm::radians(270.0f), 0.0f, 0.0f)));
+//	quadTransform->SetLocalScale(glm::vec3(1.0f, 1.0f, 1.0f));
+//
+//	MeshComponent* quadComponent = new MeshComponent(quadTransform, quad, "quad");
+//	quadComponent->SetMaterial(new Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER)));
+//	quadComponent->GetMaterial()->SetTexture(MAIN_TEX, bearTex);
+//	defaultScene->AddComponent(quadComponent);
+
 	for (int i = 0; i < cSize; i++) {
 		for (int j = 0; j < cSize; j++) {
 			for (int k = 0; k < cSize; k++){
-				if (k % 2) {
+				if (k % 2 == 0) {
 					string name = "";
 					name = name.append("bear(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
 					Transform* bear = defaultScene->CreateTransform(stuffGroup, name);
 					bear->SetLocalPosition(glm::vec3(i - cSize * 0.5, j - cSize * 0.5, k - cSize * 0.5));
+					bear->SetLocalScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
 					std::pair<Mesh**, int> mComponent = ResourceManager::LoadMesh(bearPath);
 
@@ -191,6 +205,7 @@ Scene* CreateDefaultScene() {
 					name = name.append("deer(").append(to_string(i)).append(", ").append(to_string(j).append(", ").append(to_string(k)).append(")"));
 					Transform* deer = defaultScene->CreateTransform(stuffGroup, name);
 					deer->SetLocalPosition(glm::vec3(i - cSize * 0.5, j - cSize * 0.5, k - cSize * 0.5));
+					deer->SetLocalScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
 					std::pair<Mesh**, int> mComponent = ResourceManager::LoadMesh(deerPath);
 

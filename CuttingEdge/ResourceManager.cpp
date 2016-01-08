@@ -54,7 +54,7 @@ std::pair<Mesh::MeshData**, int> ResourceManager::LoadMeshData(std::string path)
 
 			meshes[i] = new Mesh::MeshData();
 
-			meshes[i]->verticesCount = mesh->mNumVertices * 3;
+			meshes[i]->verticesCount = mesh->mNumVertices;
 
 			meshes[i]->elementsCount = mesh->mNumFaces * 3;
 
@@ -75,7 +75,22 @@ std::pair<Mesh::MeshData**, int> ResourceManager::LoadMeshData(std::string path)
 	return meshMap[path];
 }
 
+bool ResourceManager::AddMeshData(Mesh::MeshData* meshData)
+{
+	if(meshMap[meshData->name].first == nullptr && meshData->vertices.size())
+	{
+		meshMap[meshData->name].first = &meshData;
+		meshMap[meshData->name].second = 1;
+		return true;
+	}
 
+	return false;
+}
+
+std::pair<Mesh::MeshData**, int> ResourceManager::GetMeshData(std::string path)
+{
+	return meshMap[path];
+}
 
 bool ResourceManager::BufferMesh(Mesh::MeshData* meshData) {
 
@@ -315,7 +330,7 @@ std::vector<Vertex> ResourceManager::CreateFlatVertexArray(aiMesh* mesh) {
 		if(mesh->HasTextureCoords(0))
 		{
 			auto texCoords = mesh->mTextureCoords[0][i];
-			flatVertices[i].uv = glm::vec2(texCoords.x, texCoords.y);
+			flatVertices[i].uv = glm::vec2(texCoords.x, 1.0f - texCoords.y);
 		}
 	}
 

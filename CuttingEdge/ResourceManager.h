@@ -24,6 +24,10 @@ public:
 	// loads it in first
 	static std::pair<Mesh::MeshData**, int> LoadMeshData(std::string path);
 
+	static bool AddMeshData(Mesh::MeshData* meshData);
+
+	static std::pair<Mesh::MeshData**, int> GetMeshData(std::string path);
+
 	// Attempt to upload mesh data to GPU
 	// if mesh data isn't buffered, then generate buffers for it, upload them to the GPU, 
 	// and populate meshData fields (vbo, ebo) with buffer indices and return true
