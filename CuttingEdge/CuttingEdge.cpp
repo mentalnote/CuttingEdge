@@ -71,9 +71,9 @@ int main(int argc, char *argv[])
 
 	SDL_GL_SetSwapInterval(0);
 
-	glFrontFace(GL_CW);
-	//glCullFace(GL_BACK);
-	//glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
 	ShaderProgram* program = new ShaderProgram(SIMPLE_SHADER);
@@ -207,7 +207,7 @@ Scene* CreateDefaultScene() {
 					deer->SetLocalPosition(glm::vec3(i - cSize * 0.5, j - cSize * 0.5, k - cSize * 0.5));
 					deer->SetLocalScale(glm::vec3(0.01f, 0.01f, 0.01f));
 
-					std::pair<Mesh**, int> mComponent = ResourceManager::LoadMesh(deerPath);
+					std::pair<Mesh**, int> mComponent = ResourceManager::LoadMesh(deerPath, aiProcess_Triangulate | aiProcess_FlipWindingOrder);
 
 					if (mComponent.second)
 					{

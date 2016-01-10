@@ -2,7 +2,6 @@
 
 RenderTechnique::RenderTechnique() : layers()
 {
-//	this->layers = std::vector<RenderLayer*>();
 }
 
 void RenderTechnique::InitializeLayers()

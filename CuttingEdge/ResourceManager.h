@@ -17,12 +17,12 @@ public:
 	// Return new Mesh created with MeshData from meshMap, 
 	// if MeshData for given path is not in meshMap, 
 	// loads it in first
-	static std::pair<Mesh**, int> LoadMesh(std::string path);
+	static std::pair<Mesh**, int> LoadMesh(std::string path, unsigned int importFlags = aiProcess_Triangulate);
 
 	// Return MeshData from meshMap,
 	// if MeshData for given path is not in meshMap, 
 	// loads it in first
-	static std::pair<Mesh::MeshData**, int> LoadMeshData(std::string path);
+	static std::pair<Mesh::MeshData**, int> LoadMeshData(std::string path, unsigned int importFlags);
 
 	static bool AddMeshData(Mesh::MeshData* meshData);
 

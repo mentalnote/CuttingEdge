@@ -30,7 +30,7 @@ protected:
 	GLuint stencilBuffer;
 
 public:
-	void Initialize(std::vector<TexBuffer*> inputBuffers);
+	virtual void Initialize(std::vector<TexBuffer*> inputBuffers);
 
 	std::vector<TexBuffer*> GetRequiredInputs();
 

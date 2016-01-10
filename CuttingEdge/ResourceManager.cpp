@@ -11,10 +11,11 @@ std::unordered_map<std::string, ShaderProgram::Shader*> ResourceManager::shaderM
 
 std::unordered_map<std::string, ShaderProgram*> ResourceManager::shaderProgramMap = std::unordered_map<std::string, ShaderProgram*>();
 
-std::pair<Mesh**, int> ResourceManager::LoadMesh (std::string path) {
+std::pair<Mesh**, int> ResourceManager::LoadMesh(std::string path, unsigned importFlags)
+{
 	std::pair<Mesh**, int> meshes = std::pair<Mesh**, int>();
-	
-	std::pair<Mesh::MeshData**, int> meshData = LoadMeshData(path);
+
+	std::pair<Mesh::MeshData**, int> meshData = LoadMeshData(path, importFlags);
 
 	if (meshData.first == nullptr) {
 		return meshes;
@@ -30,7 +31,7 @@ std::pair<Mesh**, int> ResourceManager::LoadMesh (std::string path) {
 	return meshes;
 }
 
-std::pair<Mesh::MeshData**, int> ResourceManager::LoadMeshData(std::string path)
+std::pair<Mesh::MeshData**, int> ResourceManager::LoadMeshData(std::string path, unsigned int importFlags)
 {
 	std::pair<Mesh::MeshData**, int> meshData = meshMap[path];
 
@@ -39,7 +40,7 @@ std::pair<Mesh::MeshData**, int> ResourceManager::LoadMeshData(std::string path)
 
 		const struct aiScene* modelData;
 
-		modelData = importer->ReadFile(path, aiProcess_Triangulate);
+		modelData = importer->ReadFile(path, importFlags);
 
 		if (modelData == nullptr) {
 			return meshData;
