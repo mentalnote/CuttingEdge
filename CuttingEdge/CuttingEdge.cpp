@@ -12,28 +12,8 @@
 #include "MeshComponent.h"
 #include "Texture.h"
 #include "guicon.h"
-#include "Primitives.h"
 
 using namespace std;
-
-// Shader sources
-const GLchar* vertexSource =
-"#version 150 core\n"
-"uniform mat4 MVP;"
-"in vec3 position;"
-"out vec4 colour;"
-"void main() {"
-"   gl_Position = MVP * vec4(position.xyz * 0.01, 1.0);"
-"   colour = vec4(position.xyz, 1.0);"
-"}";
-
-const GLchar* fragmentSource =
-"#version 150 core\n"
-"in vec4 colour;"
-"out vec4 outColor;"
-"void main() {"
-"   outColor = colour;"
-"}";
 
 const string bearPath = "../Resources/Models/bear.obj";
 const string bearTexPath = "../Resources/Textures/bear.png";
@@ -76,13 +56,6 @@ int main(int argc, char *argv[])
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
-	ShaderProgram* program = new ShaderProgram(SIMPLE_SHADER);
-
-	program->shaders.push_back(ResourceManager::LoadShader(vertPath));
-	program->shaders.push_back(ResourceManager::LoadShader(fragPath));
-
-	ResourceManager::CompileShaderProgram(program);
-
 	scene = CreateDefaultScene();
 
 	if(scene == nullptr)
@@ -92,14 +65,6 @@ int main(int argc, char *argv[])
 	}
 
 	logfile << "ERROR: " << glGetError() << "\n";
-
-	Material testMat = Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER));
-
-	for (unsigned int i = 0; i < testMat.shader->properties.size(); i++)
-	{
-		auto prop = testMat.shader->properties[i];
-		logfile << prop.first << ": " << i << ", " << (int)prop.second << "\n";
-	}
 
 	double frameCount = 0;
 	double totalTime = 0;
@@ -142,7 +107,15 @@ int main(int argc, char *argv[])
 	return Cleanup(context);
 }
 
+// Create and populate a test scene object
 Scene* CreateDefaultScene() {
+	ShaderProgram* program = new ShaderProgram(SIMPLE_SHADER);
+
+	program->shaders.push_back(ResourceManager::LoadShader(vertPath));
+	program->shaders.push_back(ResourceManager::LoadShader(fragPath));
+
+	ResourceManager::CompileShaderProgram(program);
+
 	Scene* defaultScene = new Scene();
 
 	Texture* bearTex = ResourceManager::LoadTexture(bearTexPath);
@@ -162,18 +135,6 @@ Scene* CreateDefaultScene() {
 	Transform* stuffGroup = defaultScene->CreateTransform(nullptr, "Animals");
 
 	int cSize = 8;
-
-//	Mesh* quad = Primitives::CreateQuad();
-//
-//	Transform* quadTransform = defaultScene->CreateTransform(stuffGroup, "quad transform");
-//	quadTransform->SetLocalPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-//	quadTransform->SetLocalRotation(glm::quat(glm::vec3(glm::radians(270.0f), 0.0f, 0.0f)));
-//	quadTransform->SetLocalScale(glm::vec3(1.0f, 1.0f, 1.0f));
-//
-//	MeshComponent* quadComponent = new MeshComponent(quadTransform, quad, "quad");
-//	quadComponent->SetMaterial(new Material(ResourceManager::GetShaderProgram(SIMPLE_SHADER)));
-//	quadComponent->GetMaterial()->SetTexture(MAIN_TEX, bearTex);
-//	defaultScene->AddComponent(quadComponent);
 
 	for (int i = 0; i < cSize; i++) {
 		for (int j = 0; j < cSize; j++) {
